@@ -2171,12 +2171,14 @@
       // =================================================================
       // 3. KONFIGURACE A KONSTANTY
       // =================================================================
-      const SUPABASE_URL = 'https://bprawiumolizfnhuigpf.supabase.co';
-      const SUPABASE_KEY = 'sb_publishable_OCC-K3xibSWzFoLgcQ7kyg_39EH34zQ';
-      const ADMIN_EMAIL = 'marek.horacek@alza.cz';
-      const DEFAULT_PASS = 'alza-tajne-heslo-2026';
+<script src="./env-loader.js"></script>
+<script type="module">
+  const supabase = supabase.createClient(window.__ENV__.SUPABASE_URL, window.__ENV__.SUPABASE_KEY);
+  const ADMIN_EMAIL = window.__ENV__.ADMIN_EMAIL;
+  const DEFAULT_PASS = window.__ENV__.DEFAULT_PASS;
 
-      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // další kód, který používá supabase
+</script>
 
       // =================================================================
       // 4. POMOCNÉ FUNKCE
