@@ -1,0 +1,7 @@
+// env-loader.js
+window.__ENV__ = {
+  SUPABASE_URL: '%SUPABASE_URL%',
+  SUPABASE_KEY: '%SUPABASE_KEY%',
+  ADMIN_EMAIL: '%ADMIN_EMAIL%',
+  DEFAULT_PASS: '%DEFAULT_PASS%'
+};
