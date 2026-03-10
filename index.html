@@ -2168,13 +2168,13 @@
     <div id="root"></div>
 
     <script type="text/babel">
-      // =================================================================
-      // 3. KONFIGURACE A KONSTANTY
-      // =================================================================
-      const SUPABASE_URL = 'https://bprawiumolizfnhuigpf.supabase.co';
-      const SUPABASE_KEY = 'sb_publishable_OCC-K3xibSWzFoLgcQ7kyg_39EH34zQ';
-      const ADMIN_EMAIL = 'marek.horacek@alza.cz';
-      const DEFAULT_PASS = 'alza-tajne-heslo-2026';
+      // ================================================================================
+      // 3. KONFIGURACE A KONSTANTY - Replace hardcoded Supabase keys with env variables
+      // ================================================================================
+      const SUPABASE_URL = '%SUPABASE_URL%';
+      const SUPABASE_KEY = '%SUPABASE_KEY%';
+      const ADMIN_EMAIL = '%ADMIN_EMAIL%';
+      const DEFAULT_PASS = '%DEFAULT_PASS%';
 
       const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
