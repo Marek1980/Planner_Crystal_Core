@@ -2927,211 +2927,254 @@
         form,
         setForm,
         handleAddUser,
+        allowedEmails,
+        handleRemoveAccess,
       }) {
         return (
-          <div className="ios-list-card">
-            {/* --- HLAVIČKA --- */}
-            <div className="ios-list-header">
-              <span style={{ fontSize: '24px' }}>🛠️</span>
-              <div>
-                <div className="ios-header-title small">Správa týmu</div>
-                <div className="ios-header-subtitle">
-                  Přidávání kolegů a nastavení limitů
+          <div>
+            <div className="ios-list-card">
+              {/* --- HLAVIČKA --- */}
+              <div className="ios-list-header">
+                <span style={{ fontSize: '24px' }}>🛠️</span>
+                <div>
+                  <div className="ios-header-title small">Správa týmu</div>
+                  <div className="ios-header-subtitle">
+                    Přidávání kolegů a nastavení limitů
+                  </div>
                 </div>
+              </div>
+              {/* --- FORMULÁŘ PRO PŘIDÁNÍ --- */}
+              <form
+                onSubmit={handleAddUser}
+                className="ios-bday-form"
+                style={{
+                  marginBottom: 20,
+                  paddingBottom: 20,
+                  borderBottom: '1px solid rgba(0,0,0,0.06)',
+                }}
+              >
+                <div style={{ gridColumn: 'span 2' }}>
+                  <input
+                    placeholder="email.kolegy@alza.cz"
+                    value={form.newUser}
+                    onChange={(e) =>
+                      setForm({ ...form, newUser: e.target.value })
+                    }
+                    required
+                    className="ios-input-field"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="ios-btn-primary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  Přidat přístup
+                </button>
+              </form>
+              {/* --- SEZNAM UŽIVATELŮ --- */}
+              <div className="ios-list-container">
+                {allProfiles.map((p) => (
+                  <div
+                    key={p.id}
+                    className="ios-list-row"
+                    style={{ alignItems: 'flex-start', padding: '15px 5px' }}
+                  >
+                    {/* LEVÁ ČÁST: Avatar + Jméno + Oddělení */}
+                    <div
+                      className="ios-list-col main-info"
+                      style={{ gap: 12, alignItems: 'flex-start' }}
+                    >
+                      <div className="user-avatar">
+                        {p.full_name
+                          ? p.full_name.charAt(0).toUpperCase()
+                          : '?'}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 6,
+                          width: '100%',
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: 6,
+                            alignItems: 'center',
+                          }}
+                        >
+                          <input
+                            type="text"
+                            id={`{p.id}-full_name`}
+                            defaultValue={p.full_name}
+                            className="ios-table-input"
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 15,
+                              textAlign: 'left',
+                              background: 'transparent',
+                              border: '1px solid transparent',
+                              padding: '2px 0',
+                            }}
+                            placeholder="Jméno"
+                            onFocus={(e) =>
+                              (e.target.style.borderBottom =
+                                '1px solid #6366f1')
+                            }
+                            onBlur={(e) =>
+                              (e.target.style.borderBottom =
+                                '1px solid transparent')
+                            }
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() => handleSaveClick(p.id, 'full_name')}
+                            title="Uložit jméno"
+                          >
+                            💾
+                          </button>
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: 6,
+                            alignItems: 'center',
+                          }}
+                        >
+                          <input
+                            type="text"
+                            id={`{p.id}-department`}
+                            defaultValue={p.department}
+                            className="ios-table-input"
+                            style={{
+                              fontSize: 12,
+                              color: '#64748b',
+                              textAlign: 'left',
+                              width: '120px',
+                              padding: '4px',
+                            }}
+                            placeholder="Oddělení"
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() => handleSaveClick(p.id, 'department')}
+                            title="Uložit oddělení"
+                          >
+                            💾
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    {/* PRAVÁ ČÁST: Limity */}
+                    <div
+                      className="ios-list-col admin-actions"
+                      style={{ gap: 15 }}
+                    >
+                      <div className="ios-limit-group">
+                        <span className="ios-limit-label">Dovolená (h)</span>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <input
+                            type="number"
+                            id={`{p.id}-vacation_limit`}
+                            defaultValue={p.vacation_limit}
+                            className="ios-table-input"
+                            style={{ width: 55 }}
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() =>
+                              handleSaveClick(p.id, 'vacation_limit')
+                            }
+                          >
+                            💾
+                          </button>
+                        </div>
+                      </div>
+                      <div className="ios-limit-group">
+                        <span className="ios-limit-label">Whatever</span>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <input
+                            type="number"
+                            id={`{p.id}-whatever_limit`}
+                            defaultValue={p.whatever_limit}
+                            className="ios-table-input"
+                            style={{ width: 40 }}
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() =>
+                              handleSaveClick(p.id, 'whatever_limit')
+                            }
+                          >
+                            💾
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* --- FORMULÁŘ PRO PŘIDÁNÍ --- */}
-            <form
-              onSubmit={handleAddUser}
-              className="ios-bday-form"
-              style={{
-                marginBottom: 20,
-                paddingBottom: 20,
-                borderBottom: '1px solid rgba(0,0,0,0.06)',
-              }}
-            >
-              <div style={{ gridColumn: 'span 2' }}>
-                <input
-                  placeholder="email.kolegy@alza.cz"
-                  value={form.newUser}
-                  onChange={(e) =>
-                    setForm({ ...form, newUser: e.target.value })
-                  }
-                  required
-                  className="ios-input-field"
-                />
-              </div>
-              <button
-                type="submit"
-                className="ios-btn-primary"
-                style={{ width: '100%', justifyContent: 'center' }}
-              >
-                Přidat přístup
-              </button>
-            </form>
-
-            {/* --- SEZNAM UŽIVATELŮ --- */}
-            <div className="ios-list-container">
-              {allProfiles.map((p) => (
-                <div
-                  key={p.id}
-                  className="ios-list-row"
-                  style={{ alignItems: 'flex-start', padding: '15px 5px' }}
-                >
-                  {/* LEVÁ ČÁST: Avatar + Jméno + Oddělení */}
-                  <div
-                    className="ios-list-col main-info"
-                    style={{ gap: 12, alignItems: 'flex-start' }}
-                  >
-                    {/* Avatar s iniciálou */}
-                    <div className="user-avatar">
-                      {p.full_name ? p.full_name.charAt(0).toUpperCase() : '?'}
-                    </div>
-
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 6,
-                        width: '100%',
-                      }}
-                    >
-                      {/* Editace Jména */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: 6,
-                          alignItems: 'center',
-                        }}
-                      >
-                        <input
-                          type="text"
-                          id={`${p.id}-full_name`}
-                          defaultValue={p.full_name}
-                          className="ios-table-input"
-                          style={{
-                            fontWeight: 700,
-                            fontSize: 15,
-                            textAlign: 'left',
-                            background: 'transparent',
-                            border: '1px solid transparent',
-                            padding: '2px 0',
-                          }}
-                          placeholder="Jméno"
-                          onFocus={(e) =>
-                            (e.target.style.borderBottom = '1px solid #6366f1')
-                          }
-                          onBlur={(e) =>
-                            (e.target.style.borderBottom =
-                              '1px solid transparent')
-                          }
-                        />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() => handleSaveClick(p.id, 'full_name')}
-                          title="Uložit jméno"
-                        >
-                          💾
-                        </button>
-                      </div>
-
-                      {/* Editace Oddělení */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: 6,
-                          alignItems: 'center',
-                        }}
-                      >
-                        <input
-                          type="text"
-                          id={`${p.id}-department`}
-                          defaultValue={p.department}
-                          className="ios-table-input"
-                          style={{
-                            fontSize: 12,
-                            color: '#64748b',
-                            textAlign: 'left',
-                            width: '120px',
-                            padding: '4px',
-                          }}
-                          placeholder="Oddělení"
-                        />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() => handleSaveClick(p.id, 'department')}
-                          title="Uložit oddělení"
-                        >
-                          💾
-                        </button>
-                      </div>
-                    </div>
+            {/* === NOVÁ KARTA PRO SEZNAM POVOLENÝCH EMAILŮ === */}
+            <div className="ios-list-card" style={{ marginTop: '25px' }}>
+              <div className="ios-list-header">
+                <span style={{ fontSize: '24px' }}>🔑</span>
+                <div>
+                  <div className="ios-header-title small">
+                    Uživatelé s přístupem
                   </div>
-
-                  {/* PRAVÁ ČÁST: Limity */}
-                  <div
-                    className="ios-list-col admin-actions"
-                    style={{ gap: 15 }}
-                  >
-                    {/* Dovolená */}
-                    <div className="ios-limit-group">
-                      <span className="ios-limit-label">Dovolená (h)</span>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
-                      >
-                        <input
-                          type="number"
-                          id={`${p.id}-vacation_limit`}
-                          defaultValue={p.vacation_limit}
-                          className="ios-table-input"
-                          style={{ width: 55 }}
-                        />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() =>
-                            handleSaveClick(p.id, 'vacation_limit')
-                          }
-                        >
-                          💾
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Whatever */}
-                    <div className="ios-limit-group">
-                      <span className="ios-limit-label">Whatever</span>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
-                      >
-                        <input
-                          type="number"
-                          id={`${p.id}-whatever_limit`}
-                          defaultValue={p.whatever_limit}
-                          className="ios-table-input"
-                          style={{ width: 40 }}
-                        />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() =>
-                            handleSaveClick(p.id, 'whatever_limit')
-                          }
-                        >
-                          💾
-                        </button>
-                      </div>
-                    </div>
+                  <div className="ios-header-subtitle">
+                    Seznam emailů, které se mohou přihlásit do aplikace
                   </div>
                 </div>
-              ))}
+              </div>
+              <div className="ios-list-container">
+                {allowedEmails.length > 0 ? (
+                  allowedEmails.map((user) => (
+                    <div
+                      key={user.id}
+                      className="ios-list-row"
+                      style={{ padding: '10px 5px' }}
+                    >
+                      <span style={{ fontWeight: 500, color: '#334155' }}>
+                        {user.email}
+                      </span>
+                      <button
+                        onClick={() => handleRemoveAccess(user.id)}
+                        className="btn-delete"
+                        style={{ width: 'auto', padding: '8px 16px' }}
+                      >
+                        Odebrat přístup
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      color: '#94a3b8',
+                      padding: '20px',
+                    }}
+                  >
+                    Zatím nejsou definovány žádné povolené emaily.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         );
@@ -5385,6 +5428,8 @@
                 setForm={setForm}
                 handleAddUser={handleAddUser}
                 handleSaveClick={handleSaveClick}
+                allowedEmails={allowedEmails}
+                handleRemoveAccess={handleRemoveAccess}
               />
             )}
 
