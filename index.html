@@ -2167,15 +2167,25 @@
   <body>
     <div id="root"></div>
 
+    <!-- ✅ KROK 1: Vložíme proměnné z Vercelu do 'window' objektu -->
+    <script>
+      window.env = {
+        SUPABASE_URL: '%REACT_APP_SUPABASE_URL%',
+        SUPABASE_KEY: '%REACT_APP_SUPABASE_KEY%',
+        ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
+        DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
+      };
+    </script>
+
     <script type="text/babel">
       // =================================================================
       // 3. KONFIGURACE A KONSTANTY
       // =================================================================
-// OPRAVENÝ A ZABEZPEČENÝ KÓD
-const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY;
-const ADMIN_EMAIL = process.env.REACT_APP_ADMIN_EMAIL;
-const DEFAULT_PASS = process.env.REACT_APP_DEFAULT_PASS;
+      // ✅ KROK 2: Čteme hodnoty z 'window.env' místo z 'process.env'
+      const SUPABASE_URL = window.env.SUPABASE_URL;
+      const SUPABASE_KEY = window.env.SUPABASE_KEY;
+      const ADMIN_EMAIL = window.env.ADMIN_EMAIL;
+      const DEFAULT_PASS = window.env.DEFAULT_PASS;
 
       const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
