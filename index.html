@@ -3730,12 +3730,54 @@
         const handleAddUser = async (e) => {
           e.preventDefault();
           if (!form.newUser) return;
-          await supabase
+          const emailToAdd = form.newUser.toLowerCase().trim();
+
+          // Zkontrolujeme, zda email již v databázi existuje
+          const { data: existingUser, error: checkError } = await supabase
             .from('allowed_emails')
-            .insert([{ email: form.newUser.toLowerCase().trim() }]);
-          setForm({ ...form, newUser: '' });
-          fetchAllowedEmails();
-          alert('Přidáno.');
+            .select('email')
+            .eq('email', emailToAdd)
+            .single();
+
+          if (checkError && checkError.code !== 'PGRST116') {
+            // PGRST116 znamená "žádný řádek nenalezen", což je v pořádku.
+            // Jiná chyba je problém.
+            alert('Nastala chyba při kontrole emailu: ' + checkError.message);
+            return;
+          }
+
+          if (existingUser) {
+            alert('Tento uživatel již přístup má.');
+            return;
+          }
+
+          // Pokud neexistuje, přidáme ho
+          const { error: insertError } = await supabase
+            .from('allowed_emails')
+            .insert([{ email: emailToAdd }]);
+
+          if (insertError) {
+            alert('Chyba při přidávání přístupu: ' + insertError.message);
+          } else {
+            setForm({ ...form, newUser: '' });
+            fetchAllowedEmails();
+            alert('Přístup pro uživatele úspěšně přidán.');
+          }
+        };
+
+        const handleRemoveAccess = async (id) => {
+          if (confirm('Opravdu chcete tomuto uživateli odebrat přístup?')) {
+            const { error } = await supabase
+              .from('allowed_emails')
+              .delete()
+              .eq('id', id);
+            if (error) {
+              alert('Chyba při odebírání přístupu: ' + error.message);
+            } else {
+              fetchAllowedEmails(); // Aktualizuje seznam po smazání
+              alert('Přístup byl odebrán.');
+            }
+          }
         };
 
         const handleStatus = async (id, status) => {
