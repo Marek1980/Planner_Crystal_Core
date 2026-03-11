@@ -2188,10 +2188,10 @@
       const DEFAULT_PASS = window.env.DEFAULT_PASS;
 
       const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    storage: window.sessionStorage,
-  },
-});
+        auth: {
+          storage: window.sessionStorage,
+        },
+      });
 
       // =================================================================
       // 4. POMOCNÉ FUNKCE
