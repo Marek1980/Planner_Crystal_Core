@@ -1,13 +1,19 @@
 #!/bin/bash
 
-# Tento skript najde zástupné symboly v index.html a nahradí je
-# skutečnými hodnotami z proměnných prostředí Vercelu.
+# Vytvoří výstupní složku
+mkdir public
 
-echo "Starting substitution..."
+# Zkopíruje všechny potřebné soubory do výstupní složky
+# DŮLEŽITÉ: Pokud máte v projektu další soubory (obrázky, styly), přidejte je sem také!
+cp index.html public/
+cp icon.png public/
+cp manifest.json public/
 
-sed -i "s|%REACT_APP_SUPABASE_URL%|$REACT_APP_SUPABASE_URL|g" index.html
-sed -i "s|%REACT_APP_SUPABASE_KEY%|$REACT_APP_SUPABASE_KEY|g" index.html
-sed -i "s|%REACT_APP_ADMIN_EMAIL%|$REACT_APP_ADMIN_EMAIL|g" index.html
-sed -i "s|%REACT_APP_DEFAULT_PASS%|$REACT_APP_DEFAULT_PASS|g" index.html
+# Nyní provedeme náhradu proměnných, ale pouze v souboru,
+# který je uvnitř složky 'public'.
+sed -i "s|%REACT_APP_SUPABASE_URL%|$REACT_APP_SUPABASE_URL|g" public/index.html
+sed -i "s|%REACT_APP_SUPABASE_KEY%|$REACT_APP_SUPABASE_KEY|g" public/index.html
+sed -i "s|%REACT_APP_ADMIN_EMAIL%|$REACT_APP_ADMIN_EMAIL|g" public/index.html
+sed -i "s|%REACT_APP_DEFAULT_PASS%|$REACT_APP_DEFAULT_PASS|g" public/index.html
 
-echo "Substitution finished."
+echo "Build finished. Output is in 'public' directory."
