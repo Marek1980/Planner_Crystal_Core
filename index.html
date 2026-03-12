@@ -2162,6 +2162,45 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
+
+      /* ==========================================
+         NOVÝ WIDGET HODIN A DATA (iOS STYLE)
+         ========================================== */
+      .clock-widget {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 26px;
+        padding: 25px 30px;
+        margin-bottom: 25px;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+      }
+
+      .clock-time-value {
+        font-family: 'Inter', 'SF Pro Display', 'Segoe UI', sans-serif;
+        font-size: 4.5em; /* Velký a dominantní čas */
+        font-weight: 800;
+        color: #1c274c;
+        letter-spacing: -3px;
+        line-height: 1;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+      }
+
+      .clock-date-label {
+        font-size: 1.1em;
+        font-weight: 700;
+        color: #64748b; /* Tlumenější barva */
+        letter-spacing: 1px;
+        opacity: 0.8;
+      }
     </style>
   </head>
   <body>
@@ -3218,6 +3257,28 @@
         );
       }
 
+      function ClockWidget({ currentTime }) {
+        const timeString = currentTime.toLocaleTimeString('cs-CZ', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+
+        const dateString = currentTime
+          .toLocaleDateString('cs-CZ', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+          })
+          .toUpperCase();
+
+        return (
+          <div className="clock-widget">
+            <div className="clock-time-value">{timeString}</div>
+            <div className="clock-date-label">{dateString}</div>
+          </div>
+        );
+      }
+
       function DashboardCalendar({ requests }) {
         const [viewDate, setViewDate] = React.useState(new Date());
 
@@ -3441,13 +3502,32 @@
         const [workDaysCost, setWorkDaysCost] = React.useState(0);
         const [announcement, setAnnouncement] = React.useState('');
         const [dateRangeInfo, setDateRangeInfo] = React.useState(null);
-        // --- 1. FUNKCE PRO POZDRAV PODLE ČASU ---
-        const getGreeting = () => {
-          const h = new Date().getHours();
-          if (h < 4) return 'Dobrou noc';
-          if (h < 9) return 'Dobré ráno';
-          if (h < 18) return 'Dobré odpoledne';
-          return 'Dobrý večer';
+
+        // --- ZMĚNA ZAČÍNÁ ZDE ---
+
+        // 1. Přidán stav pro aktuální čas
+        const [currentTime, setCurrentTime] = React.useState(new Date());
+
+        // 2. Nový useEffect, který každou sekundu aktualizuje čas
+        React.useEffect(() => {
+          const timer = setInterval(() => {
+            setCurrentTime(new Date());
+          }, 1000); // Aktualizace každou sekundu
+
+          // Důležitý úklid po odpojení komponenty
+          return () => {
+            clearInterval(timer);
+          };
+        }, []); // Spustí se jen jednou při startu
+
+        // 3. Upravená funkce, aby přijímala datum jako argument
+        const getGreeting = (date) => {
+          const h = date.getHours();
+          if (h < 4) return 'Dobrou noc'; // 00:00 - 03:59
+          if (h < 9) return 'Dobré ráno'; // 04:00 - 08:59
+          if (h < 12) return 'Dobré dopoledne'; // 09:00 - 11:59
+          if (h < 18) return 'Dobré odpoledne'; // 12:00 - 17:59
+          return 'Dobrý večer'; // 18:00 a déle
         };
 
         // --- 2. FUNKCE PRO SKLOŇOVÁNÍ JMEN (Slovník) ---
@@ -4143,7 +4223,8 @@
                   />
                 </svg>
                 <span className="ios-header-title" style={{ fontSize: '22px' }}>
-                  {getGreeting()},{' '}
+                  {/* ZMĚNA: Pozdrav nyní reaguje na aktuální čas z našeho stavu */}
+                  {getGreeting(currentTime)},{' '}
                   {myProfile ? getVocativeName(myProfile.full_name) : 'Kolego'}{' '}
                 </span>
               </div>
@@ -4253,6 +4334,8 @@
 
             {view === 'dashboard' && (
               <div>
+                {/* ZMĚNA: Přidán nový widget hodin na začátek přehledu */}
+                <ClockWidget currentTime={currentTime} />
                 <div className="ios-dashboard-card ios-card-blur">
                   {/* 🧊 iOS Glass Card – Dashboard Header + Quick Announcement */}
                   <div
