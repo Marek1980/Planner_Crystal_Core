@@ -4352,541 +4352,541 @@
                 {/* ===================================================================== */}
 
                 {view === 'dashboard' && (
-                  <div>
-                  <div className="ios-dashboard-card ios-card-blur">
-                    {/* 🧊 iOS Glass Card – Dashboard Header + Quick Announcement */}
-                    <div
-                      className="ios-card ios-card-blur"
-                      style={{
-                        padding: '18px 20px',
-                        marginBottom: 20,
-                        borderRadius: 20,
-                      }}
-                    >
-                      {/* Názvy "Dashboard" a "Rychlé oznámení" zůstávají */}
-                      <div style={{ marginBottom: 10 }}>
-                        <div
-                          style={{
-                            fontSize: '22px',
-                            fontWeight: 700,
-                            letterSpacing: '-0.5px',
-                            color: '#0b1220',
-                          }}
-                        >
-                          Dashboard
-                        </div>
-                      </div>
-
-                      {/* Divider */}
+              <div>
+                <div className="ios-dashboard-card ios-card-blur">
+                  {/* 🧊 iOS Glass Card – Dashboard Header + Quick Announcement */}
+                  <div
+                    className="ios-card ios-card-blur"
+                    style={{
+                      padding: '18px 20px',
+                      marginBottom: 20,
+                      borderRadius: 20,
+                    }}
+                  >
+                    {/* Názvy "Dashboard" a "Rychlé oznámení" zůstávají */}
+                    <div style={{ marginBottom: 10 }}>
                       <div
                         style={{
-                          height: 1,
-                          width: '100%',
-                          background: 'rgba(0,0,0,0.07)',
-                          margin: '12px 0',
-                        }}
-                      />
-
-                      {/* Quick Announcement */}
-                      <div
-                        style={{
-                          marginBottom: 10,
-                          fontWeight: 600,
-                          fontSize: '15px',
+                          fontSize: '22px',
+                          fontWeight: 700,
+                          letterSpacing: '-0.5px',
+                          color: '#0b1220',
                         }}
                       >
-                        🔔 Rychlé oznámení
+                        Dashboard
                       </div>
+                    </div>
 
-                      {/* Vytvoření defaultního textu s datem a svátkem */}
-                      {(() => {
-                        const defaultAnnouncementText = `Dnes je ${currentTime.toLocaleDateString(
-                          'cs-CZ'
-                        )}${
-                          getCzechNameDay(currentTime)
-                            ? ` a svátek slaví ${getCzechNameDay(currentTime)}`
-                            : ''
-                        }.`;
+                    {/* Divider */}
+                    <div
+                      style={{
+                        height: 1,
+                        width: '100%',
+                        background: 'rgba(0,0,0,0.07)',
+                        margin: '12px 0',
+                      }}
+                    />
 
-                        return (
-                          <>
-                            {/* Zde začíná podmíněné zobrazení */}
-                            {isAdmin ? (
-                              // TOTO UVIDÍ ADMIN
-                              <>
-                                <div
-                                  style={{
-                                    background: 'rgba(241, 245, 249, 0.8)',
-                                    padding: '12px 15px',
-                                    borderRadius: '14px',
-                                    border: '1px solid rgba(0, 0, 0, 0.05)',
-                                    marginBottom: 12,
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                  }}
-                                >
-                                  {defaultAnnouncementText}
-                                </div>
-                                <textarea
-                                  className="ios-textarea"
-                                  placeholder="Napiš doplňující oznámení, které se zobrazí pod textem výše..."
-                                  value={announcement}
-                                  onChange={(e) =>
-                                    saveAnnouncement(e.target.value)
-                                  }
-                                  rows={3}
-                                  style={{ marginBottom: 12 }}
-                                />
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-end',
-                                  }}
-                                >
-                                  <button
-                                    type="button"
-                                    className="ios-btn-primary"
-                                    onClick={() => saveAnnouncement(announcement)}
-                                    style={{
-                                      width: 'auto',
-                                      justifyContent: 'center',
-                                    }}
-                                  >
-                                    Uložit
-                                  </button>
-                                </div>
-                              </>
-                            ) : (
-                              // TOTO UVIDÍ BĚŽNÝ UŽIVATEL
+                    {/* Quick Announcement */}
+                    <div
+                      style={{
+                        marginBottom: 10,
+                        fontWeight: 600,
+                        fontSize: '15px',
+                      }}
+                    >
+                      🔔 Rychlé oznámení
+                    </div>
+
+                    {/* Vytvoření defaultního textu s datem a svátkem */}
+                    {(() => {
+                      const defaultAnnouncementText = `Dnes je ${currentTime.toLocaleDateString(
+                        'cs-CZ'
+                      )}${
+                        getCzechNameDay(currentTime)
+                          ? ` a svátek slaví ${getCzechNameDay(currentTime)}`
+                          : ''
+                      }.`;
+
+                      return (
+                        <>
+                          {/* Zde začíná podmíněné zobrazení */}
+                          {isAdmin ? (
+                            // TOTO UVIDÍ ADMIN
+                            <>
                               <div
                                 style={{
                                   background: 'rgba(241, 245, 249, 0.8)',
                                   padding: '12px 15px',
                                   borderRadius: '14px',
-                                  minHeight: '80px',
-                                  fontSize: '14px',
-                                  color: '#334155',
-                                  whiteSpace: 'pre-wrap', // Důležité pro nové řádky
                                   border: '1px solid rgba(0, 0, 0, 0.05)',
+                                  marginBottom: 12,
+                                  fontSize: '14px',
+                                  fontWeight: '600',
                                 }}
                               >
-                                <span style={{ fontWeight: '600' }}>
-                                  {defaultAnnouncementText}
-                                </span>
-                                {/* Zobrazí doplňující zprávu jen pokud existuje */}
-                                {announcement && `\n\n${announcement}`}
+                                {defaultAnnouncementText}
                               </div>
-                            )}
-                          </>
-                        );
-                      })()}
-                    </div>
-                    {/* === ROW 1 – Velké widgety === */}
-                    {(() => {
-                      // Vytvoříme si malý blok pro naši proměnnou
-                      const widgetWidth = 260; // ✅ ZDE MŮŽETE MĚNIT ŠÍŘKU OBOU WIDGETŮ (v pixelech)
-
-                      return (
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            flexWrap: 'wrap',
-                            gap: '25px',
-                          }}
-                        >
-                          {/* 🌴 Dovolená */}
-                          <div
-                            className="premium-card"
-                            style={{
-                              padding: 20,
-                              borderRadius: 18,
-                              textAlign: 'center',
-                              width: widgetWidth, // ✅ POUŽITÍ PROMENNÉ
-                            }}
-                          >
+                              <textarea
+                                className="ios-textarea"
+                                placeholder="Napiš doplňující oznámení, které se zobrazí pod textem výše..."
+                                value={announcement}
+                                onChange={(e) =>
+                                  saveAnnouncement(e.target.value)
+                                }
+                                rows={3}
+                                style={{ marginBottom: 12 }}
+                              />
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'flex-end',
+                                }}
+                              >
+                                <button
+                                  type="button"
+                                  className="ios-btn-primary"
+                                  onClick={() => saveAnnouncement(announcement)}
+                                  style={{
+                                    width: 'auto',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  Uložit
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            // TOTO UVIDÍ BĚŽNÝ UŽIVATEL
                             <div
-                              className="bw-label"
-                              style={{ color: '#1e3a8a' }}
+                              style={{
+                                background: 'rgba(241, 245, 249, 0.8)',
+                                padding: '12px 15px',
+                                borderRadius: '14px',
+                                minHeight: '80px',
+                                fontSize: '14px',
+                                color: '#334155',
+                                whiteSpace: 'pre-wrap', // Důležité pro nové řádky
+                                border: '1px solid rgba(0, 0, 0, 0.05)',
+                              }}
                             >
-                              Dovolená
+                              <span style={{ fontWeight: '600' }}>
+                                {defaultAnnouncementText}
+                              </span>
+                              {/* Zobrazí doplňující zprávu jen pokud existuje */}
+                              {announcement && `\n\n${announcement}`}
                             </div>
-                            <div
-                              className="bw-value val-blue"
-                              style={{ fontSize: '2.8em' }}
-                            >
-                              <AnimatedNumber value={balance.vacLeft} />
-                            </div>
-                            <div className="bw-limit">
-                              z {balance.vacTotal} hodin
-                            </div>
-                          </div>
-
-                          {/* 🦄 Whatever Days */}
-                          <div
-                            className="premium-card"
-                            style={{
-                              padding: 20,
-                              borderRadius: 18,
-                              textAlign: 'center',
-                              width: widgetWidth, // ✅ POUŽITÍ PROMENNÉ
-                            }}
-                          >
-                            <div
-                              className="bw-label"
-                              style={{ color: '#a21caf' }}
-                            >
-                              Whatever Days
-                            </div>
-                            <div
-                              className="bw-value val-pink"
-                              style={{ fontSize: '2.8em' }}
-                            >
-                              {balance.whatLeft}
-                            </div>
-                            <div className="bw-limit">
-                              z {balance.whatTotal} dní
-                            </div>
-                          </div>
-                        </div>
+                          )}
+                        </>
                       );
                     })()}
-                    {/* === ROW 2 – Menší widgety === */}
-                    {(() => {
-                      // Vytvoříme si blok pro naši proměnnou
-                      const smallWidgetWidth = 240; // ✅ ZDE MŮŽETE MĚNIT ŠÍŘKU SPODNÍCH 3 WIDGETŮ
+                  </div>
+                  {/* === ROW 1 – Velké widgety === */}
+                  {(() => {
+                    // Vytvoříme si malý blok pro naši proměnnou
+                    const widgetWidth = 260; // ✅ ZDE MŮŽETE MĚNIT ŠÍŘKU OBOU WIDGETŮ (v pixelech)
 
-                      return (
+                    return (
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          flexWrap: 'wrap',
+                          gap: '25px',
+                        }}
+                      >
+                        {/* 🌴 Dovolená */}
                         <div
+                          className="premium-card"
                           style={{
-                            display: 'flex', // Změna na Flexbox
-                            justifyContent: 'center', // Centruje skupinu widgetů
-                            flexWrap: 'wrap', // Umožní zalamování na mobilech
-                            gap: '20px',
-                            marginTop: '35px',
+                            padding: 20,
+                            borderRadius: 18,
+                            textAlign: 'center',
+                            width: widgetWidth, // ✅ POUŽITÍ PROMENNÉ
                           }}
                         >
-                          {/* 🇨🇿 Příští volno */}
                           <div
-                            className="premium-card"
-                            style={{
-                              padding: 20,
-                              borderRadius: 18,
-                              textAlign: 'center',
-                              width: smallWidgetWidth, // Použití proměnné
-                            }}
+                            className="bw-label"
+                            style={{ color: '#1e3a8a' }}
                           >
-                            {/* SEM PATŘÍ IOS LABEL */}
-                            <div
-                              className="bw-label"
-                              style={{
-                                fontSize: '0.72em',
-                                opacity: 0.55,
-                                marginBottom: 4,
-                                letterSpacing: '1px',
-                                textTransform: 'uppercase',
-                              }}
-                            >
-                              Příští volno
-                            </div>
-                            {/* iOS řádek: ikona + název svátku */}
-                            <div
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 8,
-                                marginBottom: 6,
-                              }}
-                            >
-                              <span style={{ fontSize: '1.2em' }}>
-                                {getHolidayIcon(nextHoliday?.name)}
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: '1.1em',
-                                  fontWeight: 600,
-                                  color: '#1c274c',
-                                  letterSpacing: '-0.3px',
-                                }}
-                              >
-                                {nextHoliday?.name || '—'}
-                              </span>
-                            </div>
-                            {/* iOS malé datum */}
-                            <div
-                              className="bw-limit" // PŘIDÁNA TŘÍDA PRO SJEDNOCENÍ STYLU
-                              style={{
-                                marginTop: 4,
-                                background: 'rgba(255,255,255,0.7)',
-                                color: '#475569',
-                              }}
-                            >
-                              {nextHoliday?.d || '-'}.{nextHoliday?.m || '-'} (za{' '}
-                              {nextHoliday?.diff ?? '–'} dní)
-                            </div>
+                            Dovolená
                           </div>
-
-                          {/* 📈 Progres roku */}
                           <div
-                            className="premium-card"
-                            style={{
-                              padding: 20,
-                              borderRadius: 18,
-                              textAlign: 'center',
-                              width: smallWidgetWidth, // Použití proměnné
-                            }}
+                            className="bw-value val-blue"
+                            style={{ fontSize: '2.8em' }}
                           >
-                            {/* iOS label */}
-                            <div
-                              className="bw-label"
-                              style={{
-                                fontSize: '0.72em',
-                                opacity: 0.55,
-                                marginBottom: 6,
-                                letterSpacing: '1px',
-                                textTransform: 'uppercase',
-                              }}
-                            >
-                              Rok {yearProgress?.year}
-                            </div>
-                            {/* iOS řádek: ikonka + procento */}
-                            <div
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 8,
-                                marginBottom: 6,
-                              }}
-                            >
-                              {/* Ikona */}
-                              <span style={{ fontSize: '1.2em' }}>📉</span>
-                              {/* Procento */}
-                              <span
-                                style={{
-                                  fontSize: '1.1em',
-                                  fontWeight: 600,
-                                  color: '#1c274c',
-                                  letterSpacing: '-0.3px',
-                                }}
-                              >
-                                {yearProgress?.percent ?? 0}%
-                              </span>
-                            </div>
-                            {/* Progress bar – iOS compact style */}
-                            <div
-                              className="progress-container-mini"
-                              style={{
-                                width: '80%',
-                                margin: '4px auto 0',
-                              }}
-                            >
-                              <div
-                                className="progress-bar"
-                                style={{
-                                  width: `${yearProgress?.percent ?? 0}%`,
-                                }}
-                              ></div>
-                            </div>
+                            <AnimatedNumber value={balance.vacLeft} />
                           </div>
+                          <div className="bw-limit">
+                            z {balance.vacTotal} hodin
+                          </div>
+                        </div>
 
-                          {/* 🚫 Dnes chybí */}
+                        {/* 🦄 Whatever Days */}
+                        <div
+                          className="premium-card"
+                          style={{
+                            padding: 20,
+                            borderRadius: 18,
+                            textAlign: 'center',
+                            width: widgetWidth, // ✅ POUŽITÍ PROMENNÉ
+                          }}
+                        >
                           <div
-                            className="premium-card"
+                            className="bw-label"
+                            style={{ color: '#a21caf' }}
+                          >
+                            Whatever Days
+                          </div>
+                          <div
+                            className="bw-value val-pink"
+                            style={{ fontSize: '2.8em' }}
+                          >
+                            {balance.whatLeft}
+                          </div>
+                          <div className="bw-limit">
+                            z {balance.whatTotal} dní
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  {/* === ROW 2 – Menší widgety === */}
+                  {(() => {
+                    // Vytvoříme si blok pro naši proměnnou
+                    const smallWidgetWidth = 240; // ✅ ZDE MŮŽETE MĚNIT ŠÍŘKU SPODNÍCH 3 WIDGETŮ
+
+                    return (
+                      <div
+                        style={{
+                          display: 'flex', // Změna na Flexbox
+                          justifyContent: 'center', // Centruje skupinu widgetů
+                          flexWrap: 'wrap', // Umožní zalamování na mobilech
+                          gap: '20px',
+                          marginTop: '35px',
+                        }}
+                      >
+                        {/* 🇨🇿 Příští volno */}
+                        <div
+                          className="premium-card"
+                          style={{
+                            padding: 20,
+                            borderRadius: 18,
+                            textAlign: 'center',
+                            width: smallWidgetWidth, // Použití proměnné
+                          }}
+                        >
+                          {/* SEM PATŘÍ IOS LABEL */}
+                          <div
+                            className="bw-label"
                             style={{
-                              padding: 20,
-                              borderRadius: 18,
-                              textAlign: 'center',
-                              width: smallWidgetWidth, // Použití proměnné
+                              fontSize: '0.72em',
+                              opacity: 0.55,
+                              marginBottom: 4,
+                              letterSpacing: '1px',
+                              textTransform: 'uppercase',
                             }}
                           >
-                            {/* iOS label */}
-                            <div
-                              className="bw-label"
+                            Příští volno
+                          </div>
+                          {/* iOS řádek: ikona + název svátku */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 8,
+                              marginBottom: 6,
+                            }}
+                          >
+                            <span style={{ fontSize: '1.2em' }}>
+                              {getHolidayIcon(nextHoliday?.name)}
+                            </span>
+                            <span
                               style={{
-                                fontSize: '0.72em',
-                                opacity: 0.55,
-                                marginBottom: 6,
-                                letterSpacing: '1px',
-                                textTransform: 'uppercase',
+                                fontSize: '1.1em',
+                                fontWeight: 600,
+                                color: '#1c274c',
+                                letterSpacing: '-0.3px',
                               }}
                             >
-                              Dnes chybí
-                            </div>
-                            {(() => {
-                              const todayStr = new Date()
-                                .toISOString()
-                                .split('T')[0];
-                              // Připravíme seznam všech, kdo dnes chybí (zobrazí se všichni; zalamuje se do řádků)
-                              const list = (
-                                Array.isArray(requests) ? requests : []
+                              {nextHoliday?.name || '—'}
+                            </span>
+                          </div>
+                          {/* iOS malé datum */}
+                          <div
+                            className="bw-limit" // PŘIDÁNA TŘÍDA PRO SJEDNOCENÍ STYLU
+                            style={{
+                              marginTop: 4,
+                              background: 'rgba(255,255,255,0.7)',
+                              color: '#475569',
+                            }}
+                          >
+                            {nextHoliday?.d || '-'}.{nextHoliday?.m || '-'} (za{' '}
+                            {nextHoliday?.diff ?? '–'} dní)
+                          </div>
+                        </div>
+
+                        {/* 📈 Progres roku */}
+                        <div
+                          className="premium-card"
+                          style={{
+                            padding: 20,
+                            borderRadius: 18,
+                            textAlign: 'center',
+                            width: smallWidgetWidth, // Použití proměnné
+                          }}
+                        >
+                          {/* iOS label */}
+                          <div
+                            className="bw-label"
+                            style={{
+                              fontSize: '0.72em',
+                              opacity: 0.55,
+                              marginBottom: 6,
+                              letterSpacing: '1px',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            Rok {yearProgress?.year}
+                          </div>
+                          {/* iOS řádek: ikonka + procento */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 8,
+                              marginBottom: 6,
+                            }}
+                          >
+                            {/* Ikona */}
+                            <span style={{ fontSize: '1.2em' }}>📉</span>
+                            {/* Procento */}
+                            <span
+                              style={{
+                                fontSize: '1.1em',
+                                fontWeight: 600,
+                                color: '#1c274c',
+                                letterSpacing: '-0.3px',
+                              }}
+                            >
+                              {yearProgress?.percent ?? 0}%
+                            </span>
+                          </div>
+                          {/* Progress bar – iOS compact style */}
+                          <div
+                            className="progress-container-mini"
+                            style={{
+                              width: '80%',
+                              margin: '4px auto 0',
+                            }}
+                          >
+                            <div
+                              className="progress-bar"
+                              style={{
+                                width: `${yearProgress?.percent ?? 0}%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+
+                        {/* 🚫 Dnes chybí */}
+                        <div
+                          className="premium-card"
+                          style={{
+                            padding: 20,
+                            borderRadius: 18,
+                            textAlign: 'center',
+                            width: smallWidgetWidth, // Použití proměnné
+                          }}
+                        >
+                          {/* iOS label */}
+                          <div
+                            className="bw-label"
+                            style={{
+                              fontSize: '0.72em',
+                              opacity: 0.55,
+                              marginBottom: 6,
+                              letterSpacing: '1px',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            Dnes chybí
+                          </div>
+                          {(() => {
+                            const todayStr = new Date()
+                              .toISOString()
+                              .split('T')[0];
+                            // Připravíme seznam všech, kdo dnes chybí (zobrazí se všichni; zalamuje se do řádků)
+                            const list = (
+                              Array.isArray(requests) ? requests : []
+                            )
+                              .filter(
+                                (r) =>
+                                  r &&
+                                  r.status === 'approved' &&
+                                  typeof r.date_from === 'string' &&
+                                  typeof r.date_to === 'string' &&
+                                  r.date_from <= todayStr &&
+                                  r.date_to >= todayStr
                               )
-                                .filter(
-                                  (r) =>
-                                    r &&
-                                    r.status === 'approved' &&
-                                    typeof r.date_from === 'string' &&
-                                    typeof r.date_to === 'string' &&
-                                    r.date_from <= todayStr &&
-                                    r.date_to >= todayStr
-                                )
-                                .map((r) => {
-                                  const full =
-                                    r?.profiles?.full_name || 'Neznámý';
-                                  const short = full.split(' ')[0];
-                                  // Emoji podle typu
-                                  const emoji =
-                                    r?.type === 'vacation'
-                                      ? '🌴'
-                                      : r?.type === 'half'
-                                      ? '🕓'
-                                      : r?.type === 'doctor_full'
-                                      ? '🏥'
-                                      : r?.type === 'doctor_half'
-                                      ? '🏥'
-                                      : r?.type === 'sick_full'
-                                      ? '🤒'
-                                      : r?.type === 'whatever'
-                                      ? '🦄'
-                                      : '❓';
-                                  // Popisek a pastel barvy pro iOS „pill“ dle typu
-                                  const typeLabel =
-                                    r?.type === 'vacation'
-                                      ? 'Dovolená'
-                                      : r?.type === 'half'
-                                      ? 'Dovolená 4h'
-                                      : r?.type === 'doctor_full'
-                                      ? 'Lékař'
-                                      : r?.type === 'doctor_half'
-                                      ? 'Lékař 4h'
-                                      : r?.type === 'sick_full'
-                                      ? 'Nemoc'
-                                      : r?.type === 'whatever'
-                                      ? 'Whatever'
-                                      : 'Volno';
-                                  const typeBg =
-                                    r?.type === 'vacation'
-                                      ? '#c8e8ff'
-                                      : r?.type === 'half'
-                                      ? '#dbeafe'
-                                      : r?.type === 'doctor_full'
-                                      ? '#e0ffe0'
-                                      : r?.type === 'doctor_half'
-                                      ? '#f0fff0'
-                                      : r?.type === 'sick_full'
-                                      ? '#ffd9df'
-                                      : r?.type === 'whatever'
-                                      ? '#f7d2ff'
-                                      : '#e2e8f0';
-                                  const typeColor =
-                                    r?.type === 'vacation'
-                                      ? '#0c4a6e'
-                                      : r?.type === 'half'
-                                      ? '#1e3a8a'
-                                      : r?.type === 'doctor_full'
-                                      ? '#065f46'
-                                      : r?.type === 'doctor_half'
-                                      ? '#166534'
-                                      : r?.type === 'sick_full'
-                                      ? '#9f1239'
-                                      : r?.type === 'whatever'
-                                      ? '#86198f'
-                                      : '#334155';
-                                  return {
-                                    id: r?.id || `${short}-${emoji}`,
-                                    short,
-                                    emoji,
-                                    typeLabel,
-                                    typeBg,
-                                    typeColor,
-                                  };
-                                });
-                              if (list.length === 0) {
-                                return (
-                                  <div
-                                    style={{
-                                      marginTop: 6,
-                                      color: '#10b981',
-                                      fontWeight: 700,
-                                      fontSize: '1.05em',
-                                    }}
-                                  >
-                                    Nikdo 🎉
-                                  </div>
-                                );
-                              }
-                              // iOS layout – badge se zalamují, zobrazí se všichni
+                              .map((r) => {
+                                const full =
+                                  r?.profiles?.full_name || 'Neznámý';
+                                const short = full.split(' ')[0];
+                                // Emoji podle typu
+                                const emoji =
+                                  r?.type === 'vacation'
+                                    ? '🌴'
+                                    : r?.type === 'half'
+                                    ? '🕓'
+                                    : r?.type === 'doctor_full'
+                                    ? '🏥'
+                                    : r?.type === 'doctor_half'
+                                    ? '🏥'
+                                    : r?.type === 'sick_full'
+                                    ? '🤒'
+                                    : r?.type === 'whatever'
+                                    ? '🦄'
+                                    : '❓';
+                                // Popisek a pastel barvy pro iOS „pill“ dle typu
+                                const typeLabel =
+                                  r?.type === 'vacation'
+                                    ? 'Dovolená'
+                                    : r?.type === 'half'
+                                    ? 'Dovolená 4h'
+                                    : r?.type === 'doctor_full'
+                                    ? 'Lékař'
+                                    : r?.type === 'doctor_half'
+                                    ? 'Lékař 4h'
+                                    : r?.type === 'sick_full'
+                                    ? 'Nemoc'
+                                    : r?.type === 'whatever'
+                                    ? 'Whatever'
+                                    : 'Volno';
+                                const typeBg =
+                                  r?.type === 'vacation'
+                                    ? '#c8e8ff'
+                                    : r?.type === 'half'
+                                    ? '#dbeafe'
+                                    : r?.type === 'doctor_full'
+                                    ? '#e0ffe0'
+                                    : r?.type === 'doctor_half'
+                                    ? '#f0fff0'
+                                    : r?.type === 'sick_full'
+                                    ? '#ffd9df'
+                                    : r?.type === 'whatever'
+                                    ? '#f7d2ff'
+                                    : '#e2e8f0';
+                                const typeColor =
+                                  r?.type === 'vacation'
+                                    ? '#0c4a6e'
+                                    : r?.type === 'half'
+                                    ? '#1e3a8a'
+                                    : r?.type === 'doctor_full'
+                                    ? '#065f46'
+                                    : r?.type === 'doctor_half'
+                                    ? '#166534'
+                                    : r?.type === 'sick_full'
+                                    ? '#9f1239'
+                                    : r?.type === 'whatever'
+                                    ? '#86198f'
+                                    : '#334155';
+                                return {
+                                  id: r?.id || `${short}-${emoji}`,
+                                  short,
+                                  emoji,
+                                  typeLabel,
+                                  typeBg,
+                                  typeColor,
+                                };
+                              });
+                            if (list.length === 0) {
                               return (
                                 <div
                                   style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    gap: 10,
-                                    justifyContent: 'center',
-                                    marginTop: 4,
+                                    marginTop: 6,
+                                    color: '#10b981',
+                                    fontWeight: 700,
+                                    fontSize: '1.05em',
                                   }}
                                 >
-                                  {list.map((p) => (
-                                    <span
-                                      key={p.id}
-                                      style={{
-                                        background: 'rgba(255,255,255,0.8)',
-                                        border: '1px solid #e2e8f0',
-                                        padding: '6px 12px',
-                                        borderRadius: 12,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 8,
-                                        fontSize: '0.95em',
-                                        fontWeight: 600,
-                                        backdropFilter: 'blur(8px)',
-                                        WebkitBackdropFilter: 'blur(8px)',
-                                        boxShadow: '0 2px 5px rgba(0,0,0,0.06)',
-                                      }}
-                                      title={p.typeLabel}
-                                    >
-                                      {/* Jméno + emoji typu */}
-                                      <span>{p.short}</span>
-                                      <span aria-hidden="true">{p.emoji}</span>
-                                      {/* Typ volna – pastelový iOS pill */}
-                                      <span
-                                        style={{
-                                          background: p.typeBg,
-                                          color: p.typeColor,
-                                          padding: '3px 8px',
-                                          borderRadius: 8,
-                                          fontSize: '0.75em',
-                                          fontWeight: 700,
-                                          lineHeight: 1,
-                                          whiteSpace: 'nowrap',
-                                          border: '1px solid rgba(0,0,0,0.06)',
-                                        }}
-                                      >
-                                        {p.typeLabel}
-                                      </span>
-                                    </span>
-                                  ))}
+                                  Nikdo 🎉
                                 </div>
                               );
-                            })()}
-                            {/* iOS malé datum dole */}
-                            <div
-                              className="bw-limit"
-                              style={{
-                                marginTop: 10,
-                                background: 'rgba(255,255,255,0.7)',
-                                color: '#475569',
-                              }}
-                            >
-                              {new Date().toLocaleDateString('cs-CZ')}
-                            </div>
+                            }
+                            // iOS layout – badge se zalamují, zobrazí se všichni
+                            return (
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: 10,
+                                  justifyContent: 'center',
+                                  marginTop: 4,
+                                }}
+                              >
+                                {list.map((p) => (
+                                  <span
+                                    key={p.id}
+                                    style={{
+                                      background: 'rgba(255,255,255,0.8)',
+                                      border: '1px solid #e2e8f0',
+                                      padding: '6px 12px',
+                                      borderRadius: 12,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 8,
+                                      fontSize: '0.95em',
+                                      fontWeight: 600,
+                                      backdropFilter: 'blur(8px)',
+                                      WebkitBackdropFilter: 'blur(8px)',
+                                      boxShadow: '0 2px 5px rgba(0,0,0,0.06)',
+                                    }}
+                                    title={p.typeLabel}
+                                  >
+                                    {/* Jméno + emoji typu */}
+                                    <span>{p.short}</span>
+                                    <span aria-hidden="true">{p.emoji}</span>
+                                    {/* Typ volna – pastelový iOS pill */}
+                                    <span
+                                      style={{
+                                        background: p.typeBg,
+                                        color: p.typeColor,
+                                        padding: '3px 8px',
+                                        borderRadius: 8,
+                                        fontSize: '0.75em',
+                                        fontWeight: 700,
+                                        lineHeight: 1,
+                                        whiteSpace: 'nowrap',
+                                        border: '1px solid rgba(0,0,0,0.06)',
+                                      }}
+                                    >
+                                      {p.typeLabel}
+                                    </span>
+                                  </span>
+                                ))}
+                              </div>
+                            );
+                          })()}
+                          {/* iOS malé datum dole */}
+                          <div
+                            className="bw-limit"
+                            style={{
+                              marginTop: 10,
+                              background: 'rgba(255,255,255,0.7)',
+                              color: '#475569',
+                            }}
+                          >
+                            {new Date().toLocaleDateString('cs-CZ')}
                           </div>
                         </div>
-                      );
-                    })()}
+                      </div>
+                    );
+                  })()}
 
                     {/* konec card */}
                   </div>{' '}
