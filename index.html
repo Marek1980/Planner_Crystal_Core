@@ -2221,6 +2221,7 @@
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
         DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
       };
+
     </script>
 
     <script type="text/babel">
@@ -3526,7 +3527,7 @@
           const nameMap = {
             Marek: 'Marku',
             Renáta: 'Renčo',
-            Zdeňka: 'Zdeničko',
+            Zdeňka: 'Zdeňičko',
             Adam: 'Adame',
             Anna: 'Aničko',
             Jana: 'Jančo',
@@ -4122,42 +4123,110 @@
             style={{ maxWidth: view === 'year' ? 1200 : 1000 }}
           >
             <div className="noise-overlay"></div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 20,
-                flexWrap: 'wrap',
-                gap: 10,
-              }}
-            >
-              <div className="ios-header" onClick={() => setView('dashboard')}>
-                {/* Ikona a pozdrav zůstávají stejné */}
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {/* ... SVG kód ... */}
-                </svg>
-                <span className="ios-header-title" style={{ fontSize: '22px' }}>
-                  {getGreeting(currentTime)},{' '}
-                  {myProfile ? getVocativeName(myProfile.full_name) : 'Kolego'}{' '}
-                </span>
-              </div>
 
-              {/* ZMĚNA: Celý wrapper nyní lépe rozděluje prostor */}
+            {/* ===================================================================== */}
+            {/* ZDE ZAČÍNÁ FINÁLNÍ, DVOUŘÁDKOVÁ HORNÍ LIŠTA */}
+            {/* ===================================================================== */}
+            <div style={{ marginBottom: 20 }}>
+              {/* --- 1. HORNÍ ŘÁDEK: POZDRAV A DATUM/ČAS --- */}
               <div
-                className="ios-nav-wrapper"
                 style={{
-                  flex: 1,
-                  justifyContent: 'flex-end', // Zarovná vše doprava
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 15,
                 }}
               >
-                {/* NOVÝ PRVEK: Pilulka s datem a časem */}
+                {/* Pozdrav vlevo */}
+                <div
+                  className="ios-header"
+                  onClick={() => setView('dashboard')}
+                >
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 2L12 5"
+                      stroke="#1c274c"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M12 19L12 22"
+                      stroke="#1c274c"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M5 12H2"
+                      stroke="#1c274c"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M22 12H19"
+                      stroke="#1c274c"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M19.071 4.92896L16.9497 7.05028"
+                      stroke="#1c274c"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M7.05023 16.9497L4.92892 19.071"
+                      stroke="#1c274c"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M19.071 19.071L16.9497 16.9497"
+                      stroke="#1c274c"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M7.05023 7.05028L4.92892 4.92896"
+                      stroke="#1c274c"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="4"
+                      stroke="#4338ca"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span
+                    className="ios-header-title"
+                    style={{ fontSize: '22px' }}
+                  >
+                    {getGreeting(currentTime)},{' '}
+                    {myProfile
+                      ? getVocativeName(myProfile.full_name)
+                      : 'Kolego'}{' '}
+                  </span>
+                </div>
+
+                {/* Pilulka s datem a časem vpravo */}
                 <div className="ios-datetime-pill">
                   <span className="datetime-date">
                     {currentTime.toLocaleDateString('cs-CZ', {
@@ -4174,8 +4243,16 @@
                     })}
                   </span>
                 </div>
+              </div>
 
-                {/* Původní navigace a odhlášení */}
+              {/* --- 2. SPODNÍ ŘÁDEK: NAVIGACE A ODHLÁŠENÍ --- */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <div className="ios-nav-container">
                   <button
                     className={`ios-nav-button ${
@@ -4247,7 +4324,21 @@
                   }}
                   title="Odhlásit"
                 >
-                  {/* ... SVG ikona odhlášení ... */}
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M15.75 8.25L21 12.5M21 12.5L15.75 16.75M21 12.5H8.25M15 3.75C13.9378 3.32164 12.7885 3.06863 11.5833 3C7.26689 3 3.75 7.02944 3.75 12C3.75 16.9706 7.26689 21 11.5833 21C12.7885 20.9314 13.9378 20.6784 15 20.25"
+                      stroke="#64748b"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -4264,7 +4355,7 @@
                       borderRadius: 20,
                     }}
                   >
-                    {/* Title */}
+                    {/* Názvy "Dashboard" a "Rychlé oznámení" zůstávají */}
                     <div style={{ marginBottom: 10 }}>
                       <div
                         style={{
@@ -4299,77 +4390,88 @@
                       🔔 Rychlé oznámení
                     </div>
 
-                    {/* Zde začíná podmíněné zobrazení */}
-                    {isAdmin ? (
-                      // TOTO UVIDÍ POUZE ADMIN
-                      <>
-                        <textarea
-                          className="ios-textarea"
-                          placeholder="Napiš krátké oznámení…"
-                          value={announcement}
-                          onChange={(e) => saveAnnouncement(e.target.value)}
-                          rows={3}
-                          style={{ marginBottom: 12 }}
-                        />
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                            gap: 15,
-                          }}
-                        >
-                          {isAdmin && (
-                            <button
-                              className="ios-ghost-btn"
-                              type="button"
+                    {/* Vytvoření defaultního textu s datem a svátkem */}
+                    {(() => {
+                      const defaultAnnouncementText = `Dnes je ${currentTime.toLocaleDateString(
+                        'cs-CZ'
+                      )}${
+                        getCzechNameDay(currentTime)
+                          ? ` a svátek slaví ${getCzechNameDay(currentTime)}`
+                          : ''
+                      }.`;
+
+                      return (
+                        <>
+                          {/* Zde začíná podmíněné zobrazení */}
+                          {isAdmin ? (
+                            // TOTO UVIDÍ ADMIN
+                            <>
+                              <div
+                                style={{
+                                  background: 'rgba(241, 245, 249, 0.8)',
+                                  padding: '12px 15px',
+                                  borderRadius: '14px',
+                                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                                  marginBottom: 12,
+                                  fontSize: '14px',
+                                  fontWeight: '600',
+                                }}
+                              >
+                                {defaultAnnouncementText}
+                              </div>
+                              <textarea
+                                className="ios-textarea"
+                                placeholder="Napiš doplňující oznámení, které se zobrazí pod textem výše..."
+                                value={announcement}
+                                onChange={(e) =>
+                                  saveAnnouncement(e.target.value)
+                                }
+                                rows={3}
+                                style={{ marginBottom: 12 }}
+                              />
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'flex-end',
+                                }}
+                              >
+                                <button
+                                  type="button"
+                                  className="ios-btn-primary"
+                                  onClick={() => saveAnnouncement(announcement)}
+                                  style={{
+                                    width: 'auto',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  Uložit
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            // TOTO UVIDÍ BĚŽNÝ UŽIVATEL
+                            <div
                               style={{
-                                // Styly pro zarovnání a sjednocení
-                                width: 'auto', // ✅ Automatická šířka podle textu
-                                justifyContent: 'center', // ✅ Centruje text horizontálně
-                                fontWeight: '600', // ✅ Sjednocuje tučnost písma
-                                fontSize: '14px', // ✅ Sjednocuje velikost písma
+                                background: 'rgba(241, 245, 249, 0.8)',
+                                padding: '12px 15px',
+                                borderRadius: '14px',
+                                minHeight: '80px',
+                                fontSize: '14px',
+                                color: '#334155',
+                                whiteSpace: 'pre-wrap', // Důležité pro nové řádky
+                                border: '1px solid rgba(0, 0, 0, 0.05)',
                               }}
                             >
-                              Historie
-                            </button>
+                              <span style={{ fontWeight: '600' }}>
+                                {defaultAnnouncementText}
+                              </span>
+                              {/* Zobrazí doplňující zprávu jen pokud existuje */}
+                              {announcement && `\n\n${announcement}`}
+                            </div>
                           )}
-                          <button
-                            type="button"
-                            className="ios-btn-primary"
-                            onClick={() => saveAnnouncement(announcement)}
-                            style={{
-                              // Styly pro zarovnání
-                              width: 'auto', // ✅ Automatická šířka podle textu
-                              justifyContent: 'center', // ✅ Centruje text horizontálně
-                            }}
-                          >
-                            Uložit
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      // TOTO UVIDÍ BĚŽNÝ UŽIVATEL
-                      <div
-                        style={{
-                          background: 'rgba(241, 245, 249, 0.8)',
-                          padding: '12px 15px',
-                          borderRadius: '14px',
-                          minHeight: '80px',
-                          fontSize: '14px',
-                          color: '#334155',
-                          whiteSpace: 'pre-wrap', // Zachová odřádkování zadané adminem
-                          border: '1px solid rgba(0, 0, 0, 0.05)',
-                        }}
-                      >
-                        {announcement ? (
-                          announcement
-                        ) : (
-                          <em style={{ color: '#94a3b8' }}>
-                            Žádné aktuální oznámení.
-                          </em>
-                        )}
-                      </div>
-                    )}
+                        </>
+                      );
+                    })()}
                   </div>
                   {/* === ROW 1 – Velké widgety === */}
                   {(() => {
