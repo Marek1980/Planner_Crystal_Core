@@ -2921,9 +2921,217 @@
         );
       }
 
-      function TeamManagementView({
-        allProfiles,
-        handleSaveClick,
+      function ProfilesView({ allProfiles, handleSaveClick }) {
+        return (
+          <div className="ios-list-card">
+            {/* --- HLAVIČKA --- */}
+            <div className="ios-list-header">
+              <span style={{ fontSize: '24px' }}>👤</span>
+              <div>
+                <div className="ios-header-title small">
+                  Správa profilů a limitů
+                </div>
+                <div className="ios-header-subtitle">
+                  Editace jmen, narozenin, oddělení a ročních absencí
+                </div>
+              </div>
+            </div>
+
+            {/* --- SEZNAM UŽIVATELŮ K EDITACI --- */}
+            <div className="ios-list-container">
+              {allProfiles.map((p) => (
+                <div
+                  key={p.id}
+                  className="ios-list-row"
+                  style={{ alignItems: 'flex-start', padding: '20px 5px' }}
+                >
+                  {/* LEVÁ ČÁST: Avatar + Jméno + Oddělení */}
+                  <div
+                    className="ios-list-col main-info"
+                    style={{ gap: 15, alignItems: 'flex-start', flex: 1.5 }}
+                  >
+                    <div className="user-avatar">
+                      {p.full_name ? p.full_name.charAt(0).toUpperCase() : '?'}
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                        width: '100%',
+                      }}
+                    >
+                      {/* Editace jména */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: 6,
+                          alignItems: 'center',
+                        }}
+                      >
+                        <input
+                          type="text"
+                          id={`{p.id}-full_name`}
+                          defaultValue={p.full_name}
+                          className="ios-table-input"
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 16,
+                            textAlign: 'left',
+                            background: 'transparent',
+                            border: 'none',
+                            borderBottom: '1px solid transparent',
+                            padding: '4px 0',
+                            boxShadow: 'none',
+                          }}
+                          placeholder="Jméno a příjmení"
+                          onFocus={(e) =>
+                            (e.target.style.borderBottom = '1px solid #6366f1')
+                          }
+                          onBlur={(e) =>
+                            (e.target.style.borderBottom =
+                              '1px solid transparent')
+                          }
+                        />
+                        <button
+                          className="btn-icon-save"
+                          onClick={() => handleSaveClick(p.id, 'full_name')}
+                          title="Uložit jméno"
+                        >
+                          💾
+                        </button>
+                      </div>
+                      {/* Editace oddělení */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: 6,
+                          alignItems: 'center',
+                        }}
+                      >
+                        <input
+                          type="text"
+                          id={`{p.id}-department`}
+                          defaultValue={p.department}
+                          className="ios-table-input"
+                          style={{
+                            fontSize: 13,
+                            color: '#64748b',
+                            textAlign: 'left',
+                            width: '140px',
+                          }}
+                          placeholder="Oddělení"
+                        />
+                        <button
+                          className="btn-icon-save"
+                          onClick={() => handleSaveClick(p.id, 'department')}
+                          title="Uložit oddělení"
+                        >
+                          💾
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PRAVÁ ČÁST: Data a Limity */}
+                  <div
+                    className="ios-list-col admin-actions"
+                    style={{
+                      gap: 15,
+                      flex: 2,
+                      justifyContent: 'flex-end',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    {/* Datum narození */}
+                    <div className="ios-limit-group">
+                      <span className="ios-limit-label">Datum narození</span>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                      >
+                        <input
+                          type="date"
+                          id={`{p.id}-birth_date`}
+                          defaultValue={p.birth_date}
+                          className="ios-table-input"
+                          style={{ width: 120 }}
+                        />
+                        <button
+                          className="btn-icon-save"
+                          onClick={() => handleSaveClick(p.id, 'birth_date')}
+                        >
+                          💾
+                        </button>
+                      </div>
+                    </div>
+                    {/* Limit Dovolené */}
+                    <div className="ios-limit-group">
+                      <span className="ios-limit-label">Dovolená (h)</span>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                      >
+                        <input
+                          type="number"
+                          id={`{p.id}-vacation_limit`}
+                          defaultValue={p.vacation_limit}
+                          className="ios-table-input"
+                          style={{ width: 60 }}
+                        />
+                        <button
+                          className="btn-icon-save"
+                          onClick={() =>
+                            handleSaveClick(p.id, 'vacation_limit')
+                          }
+                        >
+                          💾
+                        </button>
+                      </div>
+                    </div>
+                    {/* Limit Whatever */}
+                    <div className="ios-limit-group">
+                      <span className="ios-limit-label">Whatever</span>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                      >
+                        <input
+                          type="number"
+                          id={`{p.id}-whatever_limit`}
+                          defaultValue={p.whatever_limit}
+                          className="ios-table-input"
+                          style={{ width: 50 }}
+                        />
+                        <button
+                          className="btn-icon-save"
+                          onClick={() =>
+                            handleSaveClick(p.id, 'whatever_limit')
+                          }
+                        >
+                          💾
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // ZMĚNA: Přejmenováno z TeamManagementView a zjednodušeno
+      function AccessManagementView({
         form,
         setForm,
         handleAddUser,
@@ -2935,15 +3143,15 @@
             <div className="ios-list-card">
               {/* --- HLAVIČKA --- */}
               <div className="ios-list-header">
-                <span style={{ fontSize: '24px' }}>🛠️</span>
+                <span style={{ fontSize: '24px' }}>🔑</span>
                 <div>
-                  <div className="ios-header-title small">Správa týmu</div>
+                  <div className="ios-header-title small">Správa přístupů</div>
                   <div className="ios-header-subtitle">
-                    Přidávání kolegů a nastavení limitů
+                    Přidávání a odebírání povolených emailů
                   </div>
                 </div>
               </div>
-              {/* --- FORMULÁŘ PRO PŘIDÁNÍ --- */}
+              {/* --- FORMULÁŘ PRO PŘIDÁNÍ PŘÍSTUPU --- */}
               <form
                 onSubmit={handleAddUser}
                 className="ios-bday-form"
@@ -2972,177 +3180,7 @@
                   Přidat přístup
                 </button>
               </form>
-              {/* --- SEZNAM UŽIVATELŮ --- */}
-              <div className="ios-list-container">
-                {allProfiles.map((p) => (
-                  <div
-                    key={p.id}
-                    className="ios-list-row"
-                    style={{ alignItems: 'flex-start', padding: '15px 5px' }}
-                  >
-                    {/* LEVÁ ČÁST: Avatar + Jméno + Oddělení */}
-                    <div
-                      className="ios-list-col main-info"
-                      style={{ gap: 12, alignItems: 'flex-start' }}
-                    >
-                      <div className="user-avatar">
-                        {p.full_name
-                          ? p.full_name.charAt(0).toUpperCase()
-                          : '?'}
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 6,
-                          width: '100%',
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'flex',
-                            gap: 6,
-                            alignItems: 'center',
-                          }}
-                        >
-                          <input
-                            type="text"
-                            id={`{p.id}-full_name`}
-                            defaultValue={p.full_name}
-                            className="ios-table-input"
-                            style={{
-                              fontWeight: 700,
-                              fontSize: 15,
-                              textAlign: 'left',
-                              background: 'transparent',
-                              border: '1px solid transparent',
-                              padding: '2px 0',
-                            }}
-                            placeholder="Jméno"
-                            onFocus={(e) =>
-                              (e.target.style.borderBottom =
-                                '1px solid #6366f1')
-                            }
-                            onBlur={(e) =>
-                              (e.target.style.borderBottom =
-                                '1px solid transparent')
-                            }
-                          />
-                          <button
-                            className="btn-icon-save"
-                            onClick={() => handleSaveClick(p.id, 'full_name')}
-                            title="Uložit jméno"
-                          >
-                            💾
-                          </button>
-                        </div>
-                        <div
-                          style={{
-                            display: 'flex',
-                            gap: 6,
-                            alignItems: 'center',
-                          }}
-                        >
-                          <input
-                            type="text"
-                            id={`{p.id}-department`}
-                            defaultValue={p.department}
-                            className="ios-table-input"
-                            style={{
-                              fontSize: 12,
-                              color: '#64748b',
-                              textAlign: 'left',
-                              width: '120px',
-                              padding: '4px',
-                            }}
-                            placeholder="Oddělení"
-                          />
-                          <button
-                            className="btn-icon-save"
-                            onClick={() => handleSaveClick(p.id, 'department')}
-                            title="Uložit oddělení"
-                          >
-                            💾
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    {/* PRAVÁ ČÁST: Limity */}
-                    <div
-                      className="ios-list-col admin-actions"
-                      style={{ gap: 15 }}
-                    >
-                      <div className="ios-limit-group">
-                        <span className="ios-limit-label">Dovolená (h)</span>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                          }}
-                        >
-                          <input
-                            type="number"
-                            id={`{p.id}-vacation_limit`}
-                            defaultValue={p.vacation_limit}
-                            className="ios-table-input"
-                            style={{ width: 55 }}
-                          />
-                          <button
-                            className="btn-icon-save"
-                            onClick={() =>
-                              handleSaveClick(p.id, 'vacation_limit')
-                            }
-                          >
-                            💾
-                          </button>
-                        </div>
-                      </div>
-                      <div className="ios-limit-group">
-                        <span className="ios-limit-label">Whatever</span>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                          }}
-                        >
-                          <input
-                            type="number"
-                            id={`{p.id}-whatever_limit`}
-                            defaultValue={p.whatever_limit}
-                            className="ios-table-input"
-                            style={{ width: 40 }}
-                          />
-                          <button
-                            className="btn-icon-save"
-                            onClick={() =>
-                              handleSaveClick(p.id, 'whatever_limit')
-                            }
-                          >
-                            💾
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* === NOVÁ KARTA PRO SEZNAM POVOLENÝCH EMAILŮ === */}
-            <div className="ios-list-card" style={{ marginTop: '25px' }}>
-              <div className="ios-list-header">
-                <span style={{ fontSize: '24px' }}>🔑</span>
-                <div>
-                  <div className="ios-header-title small">
-                    Uživatelé s přístupem
-                  </div>
-                  <div className="ios-header-subtitle">
-                    Seznam emailů, které se mohou přihlásit do aplikace
-                  </div>
-                </div>
-              </div>
+              {/* --- SEZNAM UŽIVATELŮ S PŘÍSTUPEM --- */}
               <div className="ios-list-container">
                 {allowedEmails.length > 0 ? (
                   allowedEmails.map((user) => (
@@ -4136,14 +4174,27 @@
                     📋 <span className="nav-text">Žádosti</span>
                   </button>
                   {isAdmin && (
-                    <button
-                      className={`ios-nav-button ${
-                        view === 'team' ? 'active' : ''
-                      }`}
-                      onClick={() => setView('team')}
-                    >
-                      🛠 <span className="nav-text">Správa</span>
-                    </button>
+                    <>
+                      {' '}
+                      {/* ZMĚNA: Obaleno fragmentem pro více tlačítek */}
+                      <button
+                        className={`ios-nav-button ${
+                          view === 'team' ? 'active' : ''
+                        }`}
+                        onClick={() => setView('team')}
+                      >
+                        🔑 <span className="nav-text">Správa</span>
+                      </button>
+                      {/* ZMĚNA: Přidáno nové tlačítko "Profily" */}
+                      <button
+                        className={`ios-nav-button ${
+                          view === 'profiles' ? 'active' : ''
+                        }`}
+                        onClick={() => setView('profiles')}
+                      >
+                        👤 <span className="nav-text">Profily</span>
+                      </button>
+                    </>
                   )}
                   <button
                     className={`ios-nav-button ${
@@ -5421,20 +5472,26 @@
               </div>
             )}
 
+            {/* ZMĚNA: Původní "team" nyní volá novou, jednodušší komponentu */}
             {view === 'team' && isAdmin && (
-              <TeamManagementView
-                allProfiles={allProfiles}
+              <AccessManagementView
                 form={form}
                 setForm={setForm}
                 handleAddUser={handleAddUser}
-                handleSaveClick={handleSaveClick}
                 allowedEmails={allowedEmails}
                 handleRemoveAccess={handleRemoveAccess}
               />
             )}
 
-            {view === 'year' && <YearView requests={requests} />}
+            {/* ZMĚNA: Přidána logika pro zobrazení nové komponenty profilů */}
+            {view === 'profiles' && isAdmin && (
+              <ProfilesView
+                allProfiles={allProfiles}
+                handleSaveClick={handleSaveClick}
+              />
+            )}
 
+            {view === 'year' && <YearView requests={requests} />}
             {view === 'birthdays' && (
               <div>
                 {/* ===== NOVÝ iOS WIDGET PRO NEJBLIŽŠÍ NAROZENINY ===== */}
