@@ -1066,98 +1066,105 @@
       }
 
       /* =======================================================
-   PREMIUM BIRTHDAY WIDGET ("SPOTLIGHT" STYLE)
-   ======================================================= */
-      .ios-bday-widget {
+         ELEGANTNÍ NAROZENINOVÝ WIDGET (GOLD SPOTLIGHT)
+         ======================================================= */
+      /* Definice animace pro třpytivý efekt */
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%) skewX(-15deg);
+        }
+        100% {
+          transform: translateX(200%) skewX(-15deg);
+        }
+      }
+
+      /* Hlavní kontejner widgetu */
+      .bday-widget-elegant {
         background: linear-gradient(
-          145deg,
-          #fafff5,
-          #eefbf2
-        ); /* Ještě jemnější zelená */
-        border-radius: 28px; /* Více zakulacené */
-        padding: 30px;
+          135deg,
+          #fffbeb,
+          #fef3c7
+        ); /* Zlatavý gradient */
+        border-radius: 22px;
+        padding: 20px 25px;
         margin-bottom: 25px;
-        text-align: center;
-        border: 1px solid rgba(200, 220, 200, 0.6);
-        box-shadow: 0 12px 35px rgba(20, 90, 50, 0.08);
+        border: 1px solid rgba(251, 191, 36, 0.4);
+        box-shadow: 0 10px 30px rgba(234, 179, 8, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 20px;
         position: relative;
-        overflow: hidden; /* Důležité pro auru */
+        overflow: hidden; /* Nutné pro shimmer efekt */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      /* Hover efekt - karta se lehce zvedne */
+      .bday-widget-elegant:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(234, 179, 8, 0.2);
+      }
+
+      /* Třpytivá vrstva přes pseudo-element */
+      .bday-widget-elegant::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.5) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        animation: shimmer 4s infinite linear;
+      }
+
+      /* Stylování pro ikonu dortu */
+      .bday-icon-wrapper {
+        font-size: 40px;
+        flex-shrink: 0; /* Zabrání zmenšení ikony */
+      }
+
+      /* Kontejner pro texty */
+      .bday-text-wrapper {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 220px; /* Dáme mu více prostoru */
+        gap: 4px;
       }
 
-      /* Jemná barevná "aura" v pozadí */
-      .bday-aura {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 150px;
-        height: 150px;
-        background: radial-gradient(
-          circle,
-          rgba(6, 172, 85, 0.2) 0%,
-          rgba(6, 172, 85, 0) 70%
-        );
-        filter: blur(30px);
-        opacity: 0.7;
-        pointer-events: none; /* Aby neblokovala text */
-      }
-
-      /* Horní titulek */
+      /* Titulek "Nejbližší narozeniny" */
       .bday-widget-title {
-        font-weight: 600;
-        color: #166534;
-        font-size: 1.05em;
-        margin-bottom: 15px; /* Více prostoru */
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        backdrop-filter: blur(5px); /* Aby byl čitelný přes auru */
+        font-size: 0.8em;
+        font-weight: 700;
+        color: #9a3412; /* Tmavě oranžová */
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
       /* Jméno oslavence */
       .bday-widget-name {
-        font-size: 2.8em; /* Velké a sebevědomé */
+        font-size: 1.8em;
         font-weight: 800;
-        color: #052e16; /* Téměř černá zelená pro max kontrast */
-        letter-spacing: -1.5px;
-        line-height: 1;
-        z-index: 1; /* Aby bylo nad aurou */
+        color: #451a03; /* Tmavě hnědá pro kontrast */
+        line-height: 1.1;
+        letter-spacing: -0.5px;
       }
 
-      /* Spodní řádek s informacemi */
-      .bday-widget-footer {
-        margin-top: 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(255, 255, 255, 0.7);
-        padding: 8px;
-        border-radius: 999px; /* Jeden velký "pill" pro obě informace */
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.9);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      /* Spodní řádek s datem a odpočtem */
+      .bday-widget-info {
+        font-size: 0.95em;
+        font-weight: 500;
+        color: #78350f;
       }
 
-      .bday-widget-date {
-        font-weight: 600;
-        color: #166534;
-        font-size: 0.9em;
-        padding: 0 8px;
-      }
-
-      /* Finální "pill" pro odpočet */
-      .bday-widget-pill {
-        background: #22c55e;
-        color: #ffffff;
+      /* Zvýraznění odpočtu */
+      .bday-widget-info strong {
         font-weight: 700;
-        padding: 6px 14px;
-        border-radius: 999px;
-        font-size: 0.9em;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 2px 6px;
+        border-radius: 6px;
       }
 
       /* --- 2. Karta pro seznam a formuláře --- */
@@ -2226,7 +2233,7 @@
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
         DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
       };
-      
+
     </script>
 
     <script type="text/babel">
@@ -5592,37 +5599,35 @@
             {view === 'year' && <YearView requests={requests} />}
             {view === 'birthdays' && (
               <div>
-                {/* ===== NOVÝ iOS WIDGET PRO NEJBLIŽŠÍ NAROZENINY ===== */}
+                {/* ✅ NOVÝ, ELEGANTNÍ NAROZENINOVÝ WIDGET */}
                 {nextBirthdayPerson && (
-                  <div className="ios-bday-widget">
-                    {/* --- Nová Aura v pozadí --- */}
-                    <div className="bday-aura"></div>
-
-                    {/* Horní titulek */}
-                    <div className="bday-widget-title">
-                      <span role="img" aria-label="Jiskry">
-                        ✨
-                      </span>
-                      V centru pozornosti
+                  <div className="bday-widget-elegant">
+                    {/* Ikona */}
+                    <div
+                      className="bday-icon-wrapper"
+                      role="img"
+                      aria-label="Dort"
+                    >
+                      🎂
                     </div>
 
-                    {/* Jméno oslavence */}
-                    <div className="bday-widget-name">
-                      {nextBirthdayPerson.full_name}
-                    </div>
-
-                    {/* Spodní řádek s datem a odpočtem */}
-                    <div className="bday-widget-footer">
-                      <div className="bday-widget-date">
+                    {/* Texty */}
+                    <div className="bday-text-wrapper">
+                      <div className="bday-widget-title">
+                        Nejbližší narozeniny
+                      </div>
+                      <div className="bday-widget-name">
+                        {nextBirthdayPerson.full_name}
+                      </div>
+                      <div className="bday-widget-info">
+                        Slaví{' '}
                         {new Date(
                           nextBirthdayPerson.birth_date
                         ).toLocaleDateString('cs-CZ', {
                           day: 'numeric',
                           month: 'long',
-                        })}
-                      </div>
-                      <div className="bday-widget-pill">
-                        Už za {nextBirthdayPerson.diffDays} dní
+                        })}{' '}
+                        (za <strong>{nextBirthdayPerson.diffDays} dní</strong>)
                       </div>
                     </div>
                   </div>
