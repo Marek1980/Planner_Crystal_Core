@@ -809,35 +809,26 @@
         }
       }
 
-      /* ================================================
-         FINÁLNÍ STYL PRO "LEAVE BADGE" (iOS GLASS)
-         ================================================ */
-         .leave-badge {
-        /* Rozložení a rozměry */
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        border-radius: 10px;
-        margin-top: 1px;
-        
-        /* Typografie */
-        font-size: 0.75em; /* Lehce jsem zvětšil pro lepší čitelnost s ikonou */
-        font-weight: 600;
-        white-space: nowrap;
-        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
-        
-        /* Vizuální efekty */
+      .leave-badge {
+        font-size: 0.7em;
+        padding: 1px 3px;
+        border-radius: 3px;
         overflow: hidden;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        white-space: nowrap;
+        margin-top: 1px;
+        /* color: white;  <-- SMAZÁNO */
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4); /* ✅ PŘIDÁNO: Jemný stín pro lepší čitelnost */
       }
 
-      .leave-badge:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+      /* ==== iOS Glass Upgrade for all leave badges ==== */
+      .leave-badge {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 10px !important;
+        padding: 4px 10px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
 
       .leave-badge:hover {
@@ -2395,19 +2386,6 @@
         return '📅';
       };
 
-            // ✅ NOVÁ POMOCNÁ FUNKCE PRO IKONY V KALENDÁŘI
-            const getLeaveTypeIcon = (type) => {
-        switch (type) {
-          case 'vacation': return '🌴';
-          case 'half': return '🕓';
-          case 'doctor_full': return '🏥';
-          case 'doctor_half': return '🏥';
-          case 'sick_full': return '🤒';
-          case 'whatever': return '🦄';
-          default: return '❓';
-        }
-      };
-
       const getTypeName = (type) => {
         if (type === 'half') return '🌓 Půl den';
         if (type === 'whatever') return '🦄 Whatever';
@@ -2945,17 +2923,15 @@
                         marginTop: 2,
                       }}
                     >
-                    {busyList.map((r) => (
+                      {busyList.map((r) => (
                         <div
                           key={r.id}
                           className={`leave-badge leave-${
                             r.type || 'vacation'
                           }`}
-                          title={getTypeName(r.type)}
+                          title={r.profiles?.full_name}
                         >
-                          {/* ✅ PŘIDÁNO: Zobrazení ikony pomocí nové funkce */}
-                          <span>{getLeaveTypeIcon(r.type)}</span>
-                          <span>{r.profiles?.full_name.split(' ')[0]}</span>
+                          {r.profiles?.full_name.split(' ')[0]}
                         </div>
                       ))}
                     </div>
@@ -3449,17 +3425,15 @@
                         gap: 2,
                       }}
                     >
-                    {busyList.map((r) => (
+                      {busyList.map((r) => (
                         <div
                           key={r.id}
                           className={`leave-badge leave-${
                             r.type || 'vacation'
                           }`}
-                          title={r.profiles?.full_name}
+                          title={getTypeName(r.type)}
                         >
-                          {/* ✅ PŘIDÁNO: Zobrazení ikony i zde */}
-                          <span>{getLeaveTypeIcon(r.type)}</span>
-                          <span>{r.profiles?.full_name.split(' ')[0]}</span>
+                          {r.profiles?.full_name.split(' ')[0]}
                         </div>
                       ))}
                     </div>
