@@ -2163,49 +2163,54 @@
         letter-spacing: 0.5px;
       }
 
-      /* ==========================================
-         NOVÁ PILULKA PRO DATUM A ČAS (TOP TIER)
-         ========================================== */
-      .ios-datetime-pill {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(235, 235, 240, 0.7);
-        border-radius: 999px;
-        padding: 8px 16px;
-        border: 1px solid rgba(0, 0, 0, 0.04);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      /* ================================================
+         ELEGANTNÍ DATUM A ČAS S ANIMACÍ (iOS STYLE)
+         ================================================ */
+      /* Definice animace pro plynulé objevení */
+      @keyframes fadeInRight {
+        from {
+          opacity: 0;
+          transform: translateX(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
       }
 
+      /* Kontejner, který jen zarovnává prvky a spouští animaci */
+      .datetime-container {
+        display: flex;
+        align-items: baseline; /* Zarovná texty na účaří */
+        gap: 12px;
+        opacity: 0; /* Začíná neviditelný */
+        animation: fadeInRight 0.6s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+          forwards;
+      }
+
+      /* Decentní styl pro datum */
       .datetime-date {
-        font-size: 14px;
-        font-weight: 600;
-        color: #334155;
+        font-size: 15px;
+        font-weight: 500;
+        color: #64748b; /* Jemnější šedá */
         white-space: nowrap;
         text-transform: capitalize;
       }
 
+      /* Výrazný styl pro čas */
       .datetime-time {
-        font-family: 'Inter', 'SF Mono', 'Menlo', monospace; /* Monospace pro čas, aby neposkakoval */
-        font-size: 14px;
-        font-weight: 700;
-        color: #0b1220;
-        background: rgba(255, 255, 255, 0.6);
-        padding: 4px 8px;
-        border-radius: 8px;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        font-variant-numeric: tabular-nums; /* Zajišťuje stejnou šířku pro všechna čísla */
+        font-family: 'Inter', 'SF Mono', monospace;
+        font-size: 15px;
+        font-weight: 700; /* Tučnější pro důraz */
+        color: #1e293b; /* Tmavá, ale ne úplně černá */
+        /* Zajišťuje, že číslice nebudou "skákat" při změně */
+        font-variant-numeric: tabular-nums;
       }
 
-      /* Skryjeme text data na menších mobilech, aby se to vešlo */
-      @media (max-width: 1100px) {
+      /* Na mobilech skryjeme textové datum pro úsporu místa */
+      @media (max-width: 768px) {
         .datetime-date {
           display: none;
-        }
-        .ios-datetime-pill {
-          gap: 0;
         }
       }
     </style>
@@ -2221,7 +2226,7 @@
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
         DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
       };
-
+      
     </script>
 
     <script type="text/babel">
@@ -2839,7 +2844,7 @@
               ))}
               {/* Prázdná místa */}
               {emptySlots.map((s) => (
-                <div key={`empty-${s}`}></div>
+                <div key={`empty-${s}`}></div> // ✅ OPRAVENO
               ))}
               {/* Dny */}
               {days.map((d) => {
@@ -4226,8 +4231,8 @@
                   </span>
                 </div>
 
-                {/* Pilulka s datem a časem vpravo */}
-                <div className="ios-datetime-pill">
+                {/* Elegantní datum a čas vpravo */}
+                <div className="datetime-container">
                   <span className="datetime-date">
                     {currentTime.toLocaleDateString('cs-CZ', {
                       weekday: 'long',
@@ -4390,38 +4395,16 @@
                       🔔 Rychlé oznámení
                     </div>
 
-                    {/* Vytvoření defaultního textu s datem a svátkem */}
+                    {/* ✅ NOVÝ, UPRAVENÝ KÓD PRO OZNÁMENÍ */}
                     {(() => {
-                      const defaultAnnouncementText = `Dnes je ${currentTime.toLocaleDateString(
-                        'cs-CZ'
-                      )}${
-                        getCzechNameDay(currentTime)
-                          ? ` a svátek slaví ${getCzechNameDay(currentTime)}`
-                          : ''
-                      }.`;
-
                       return (
                         <>
-                          {/* Zde začíná podmíněné zobrazení */}
                           {isAdmin ? (
                             // TOTO UVIDÍ ADMIN
                             <>
-                              <div
-                                style={{
-                                  background: 'rgba(241, 245, 249, 0.8)',
-                                  padding: '12px 15px',
-                                  borderRadius: '14px',
-                                  border: '1px solid rgba(0, 0, 0, 0.05)',
-                                  marginBottom: 12,
-                                  fontSize: '14px',
-                                  fontWeight: '600',
-                                }}
-                              >
-                                {defaultAnnouncementText}
-                              </div>
                               <textarea
                                 className="ios-textarea"
-                                placeholder="Napiš doplňující oznámení, které se zobrazí pod textem výše..."
+                                placeholder="Napiš oznámení, které uvidí celý tým..."
                                 value={announcement}
                                 onChange={(e) =>
                                   saveAnnouncement(e.target.value)
@@ -4458,15 +4441,27 @@
                                 minHeight: '80px',
                                 fontSize: '14px',
                                 color: '#334155',
-                                whiteSpace: 'pre-wrap', // Důležité pro nové řádky
+                                whiteSpace: 'pre-wrap',
                                 border: '1px solid rgba(0, 0, 0, 0.05)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
                               }}
                             >
-                              <span style={{ fontWeight: '600' }}>
-                                {defaultAnnouncementText}
-                              </span>
-                              {/* Zobrazí doplňující zprávu jen pokud existuje */}
-                              {announcement && `\n\n${announcement}`}
+                              {announcement ? (
+                                <span style={{ width: '100%' }}>
+                                  {announcement}
+                                </span>
+                              ) : (
+                                <span
+                                  style={{
+                                    color: '#94a3b8',
+                                    fontStyle: 'italic',
+                                  }}
+                                >
+                                  Žádné nové oznámení.
+                                </span>
+                              )}
                             </div>
                           )}
                         </>
