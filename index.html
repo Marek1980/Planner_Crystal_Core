@@ -3210,22 +3210,17 @@
       }
 
       function ProfilesView({ allProfiles, handleSaveClick, allRequests }) {
-        // Pomocná funkce pro barvu avatara podle jména
         const getAvatarStyle = (name) => {
           if (!name)
-            return { background: 'linear-gradient(135deg, #94a3b8, #64748b)' }; // Šedá pro neznámé
-
-          // Paleta jemných iOS gradientů
+            return { background: 'linear-gradient(135deg, #94a3b8, #64748b)' };
           const gradients = [
-            'linear-gradient(135deg, #60a5fa, #3b82f6)', // Modrá
-            'linear-gradient(135deg, #a78bfa, #8b5cf6)', // Fialová
-            'linear-gradient(135deg, #34d399, #10b981)', // Zelená (Emerald)
-            'linear-gradient(135deg, #fb7185, #f43f5e)', // Růžová (Rose)
-            'linear-gradient(135deg, #f472b6, #db2777)', // Pink
-            'linear-gradient(135deg, #fb923c, #f97316)', // Oranžová
+            'linear-gradient(135deg, #60a5fa, #3b82f6)',
+            'linear-gradient(135deg, #a78bfa, #8b5cf6)',
+            'linear-gradient(135deg, #34d399, #10b981)',
+            'linear-gradient(135deg, #fb7185, #f43f5e)',
+            'linear-gradient(135deg, #f472b6, #db2777)',
+            'linear-gradient(135deg, #fb923c, #f97316)',
           ];
-
-          // Vybereme barvu podle délky jména a prvního písmene (aby byla konzistentní)
           const index = (name.length + name.charCodeAt(0)) % gradients.length;
           return { background: gradients[index] };
         };
@@ -3256,7 +3251,7 @@
           <div
             style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}
           >
-            {/* === 1. KARTA: PŘEHLED ZŮSTATKŮ === */}
+            {/* === 1. KARTA: PŘEHLED ZŮSTATKŮ (Beze změny, funguje dobře) === */}
             <div className="ios-list-card">
               <div className="ios-list-header" style={{ marginBottom: 15 }}>
                 <div
@@ -3286,7 +3281,6 @@
                 </div>
               </div>
 
-              {/* Hlavička tabulky */}
               <div
                 style={{
                   display: 'flex',
@@ -3321,7 +3315,6 @@
                       className="ios-list-row"
                       style={{ padding: '12px 5px' }}
                     >
-                      {/* Avatar + Jméno */}
                       <div
                         style={{
                           flex: 1.5,
@@ -3331,7 +3324,6 @@
                           overflow: 'hidden',
                         }}
                       >
-                        {/* ✅ NOVÝ AVATAR */}
                         <div
                           className="ios-avatar-circle small"
                           style={getAvatarStyle(p.full_name)}
@@ -3351,8 +3343,6 @@
                           {p.full_name}
                         </div>
                       </div>
-
-                      {/* Čísla */}
                       <div
                         style={{
                           flex: 1,
@@ -3403,7 +3393,7 @@
               </div>
             </div>
 
-            {/* === 2. KARTA: EDITACE LIMITŮ === */}
+            {/* === 2. KARTA: EDITACE LIMITŮ (OPRAVENO) === */}
             <div className="ios-list-card">
               <div className="ios-list-header">
                 <div
@@ -3424,7 +3414,9 @@
                   <div className="ios-header-title small">
                     Nastavení profilů
                   </div>
-                  <div className="ios-header-subtitle">Editace údajů</div>
+                  <div className="ios-header-subtitle">
+                    Klikni do pole pro editaci
+                  </div>
                 </div>
               </div>
 
@@ -3433,14 +3425,22 @@
                   <div
                     key={p.id}
                     className="ios-list-row"
-                    style={{ alignItems: 'flex-start', padding: '15px 5px' }}
+                    style={{
+                      alignItems: 'flex-start',
+                      padding: '20px 5px',
+                      flexWrap: 'wrap', // Povolíme zalamování celého řádku na mobilech
+                      gap: '15px',
+                    }}
                   >
-                    {/* LEVÁ ČÁST */}
+                    {/* LEVÁ ČÁST: Avatar + Jméno + Oddělení */}
                     <div
                       className="ios-list-col main-info"
-                      style={{ gap: 15, alignItems: 'flex-start', flex: 1.5 }}
+                      style={{
+                        gap: 15,
+                        alignItems: 'flex-start',
+                        flex: '1 1 300px', // Minimální šířka 300px, jinak se zalomí
+                      }}
                     >
-                      {/* ✅ NOVÝ AVATAR (VĚTŠÍ) */}
                       <div
                         className="ios-avatar-circle"
                         style={getAvatarStyle(p.full_name)}
@@ -3458,36 +3458,22 @@
                           width: '100%',
                         }}
                       >
-                        <input
-                          type="text"
-                          id={`${p.id}-full_name`}
-                          defaultValue={p.full_name}
-                          className="ios-table-input"
-                          style={{
-                            fontWeight: 700,
-                            fontSize: 16,
-                            textAlign: 'left',
-                            background: 'transparent',
-                            border: 'none',
-                            padding: '0',
-                            boxShadow: 'none',
-                          }}
-                          placeholder="Jméno"
-                        />
-                        <div style={{ display: 'flex', gap: 6 }}>
+                        {/* Jméno - nyní s jemným okrajem, aby bylo vidět */}
+                        <div style={{ display: 'flex', gap: 6, width: '100%' }}>
                           <input
                             type="text"
-                            id={`${p.id}-department`}
-                            defaultValue={p.department}
+                            id={`${p.id}-full_name`}
+                            defaultValue={p.full_name}
                             className="ios-table-input"
                             style={{
-                              fontSize: 13,
-                              color: '#64748b',
+                              fontWeight: 700,
+                              fontSize: 15,
                               textAlign: 'left',
+                              background: 'rgba(255,255,255,0.6)',
+                              border: '1px solid rgba(0,0,0,0.1)', // Viditelný okraj
                               width: '100%',
-                              background: 'rgba(255,255,255,0.5)',
                             }}
-                            placeholder="Oddělení"
+                            placeholder="Jméno"
                           />
                           <button
                             className="btn-icon-save"
@@ -3497,28 +3483,46 @@
                             💾
                           </button>
                         </div>
+
+                        {/* Oddělení */}
+                        <input
+                          type="text"
+                          id={`${p.id}-department`}
+                          defaultValue={p.department}
+                          className="ios-table-input"
+                          style={{
+                            fontSize: 13,
+                            color: '#64748b',
+                            textAlign: 'left',
+                            width: '100%',
+                            background: 'rgba(255,255,255,0.4)',
+                            border: '1px solid rgba(0,0,0,0.05)',
+                          }}
+                          placeholder="Oddělení (např. IT)"
+                        />
                       </div>
                     </div>
 
-                    {/* PRAVÁ ČÁST */}
+                    {/* PRAVÁ ČÁST: Data a Limity (Opraveno zalamování) */}
                     <div
                       className="ios-list-col admin-actions"
                       style={{
                         gap: 10,
-                        flex: 2,
-                        justifyContent: 'flex-end',
-                        flexWrap: 'wrap',
+                        flex: '1 1 auto',
+                        justifyContent: 'flex-start', // Zarovnáme doleva, pokud se zalomí
+                        flexWrap: 'wrap', // Povolíme zalamování inputů
                       }}
                     >
+                      {/* Datum narození */}
                       <div className="ios-limit-group">
-                        <span className="ios-limit-label">Nar.</span>
+                        <span className="ios-limit-label">Narozeniny</span>
                         <div style={{ display: 'flex', gap: 4 }}>
                           <input
                             type="date"
                             id={`${p.id}-birth_date`}
                             defaultValue={p.birth_date}
                             className="ios-table-input"
-                            style={{ width: 105 }}
+                            style={{ width: '110px' }} // Fixní šířka, aby neutekl
                           />
                           <button
                             className="btn-icon-save"
@@ -3528,20 +3532,44 @@
                           </button>
                         </div>
                       </div>
+
+                      {/* Limit Dovolená */}
                       <div className="ios-limit-group">
-                        <span className="ios-limit-label">Limit (h)</span>
+                        <span className="ios-limit-label">Dovolená (h)</span>
                         <div style={{ display: 'flex', gap: 4 }}>
                           <input
                             type="number"
                             id={`${p.id}-vacation_limit`}
                             defaultValue={p.vacation_limit}
                             className="ios-table-input"
-                            style={{ width: 50 }}
+                            style={{ width: '60px' }}
                           />
                           <button
                             className="btn-icon-save"
                             onClick={() =>
                               handleSaveClick(p.id, 'vacation_limit')
+                            }
+                          >
+                            💾
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Limit Whatever (VRÁCENO ZPĚT) */}
+                      <div className="ios-limit-group">
+                        <span className="ios-limit-label">Whatever</span>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <input
+                            type="number"
+                            id={`${p.id}-whatever_limit`}
+                            defaultValue={p.whatever_limit}
+                            className="ios-table-input"
+                            style={{ width: '50px' }}
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() =>
+                              handleSaveClick(p.id, 'whatever_limit')
                             }
                           >
                             💾
@@ -3556,7 +3584,6 @@
           </div>
         );
       }
-
       // ZMĚNA: Přejmenováno z TeamManagementView a zjednodušeno
       function AccessManagementView({
         form,
