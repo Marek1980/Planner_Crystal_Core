@@ -1362,19 +1362,29 @@
          NOVÉ STYLY PRO SPRÁVU TÝMU (iOS)
          ========================================== */
 
-      .user-avatar {
-        width: 42px;
-        height: 42px;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        color: white;
+      .ios-avatar-circle {
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
         font-size: 16px;
-        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+        font-weight: 600;
+        color: #fff;
         flex-shrink: 0;
+        /* Klíčové pro "čistý" vzhled: */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border: 2px solid #ffffff; /* Bílý rámeček oddělí avatar od pozadí */
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        background-size: 200% 200%;
+      }
+
+      /* Menší verze pro hustší seznamy (pokud je potřeba) */
+      .ios-avatar-circle.small {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
       }
 
       .ios-limit-group {
@@ -2382,19 +2392,21 @@
         font-size: 13px;
       }
 
-      /* Animace pulzování pro telefon - JEMNĚJŠÍ iOS VERZE */
+      /* Animace pulzování pro telefon - JEMNÁ ZÁŘE */
       @keyframes pulse-red {
         0% {
           transform: scale(1);
-          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2);
+          /* Stín začíná jako jemná červená záře */
+          box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.3);
         }
         70% {
-          transform: scale(1.08);
-          box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+          transform: scale(1.1); /* Zvětšení celého tvaru */
+          /* Stín se roztáhne do ztracena */
+          box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
         }
         100% {
           transform: scale(1);
-          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+          box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
         }
       }
 
@@ -2414,7 +2426,7 @@
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
         DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
       };
-
+      //
     </script>
 
     <script type="text/babel">
@@ -2432,6 +2444,21 @@
           storage: window.sessionStorage,
         },
       });
+      //
+    </script>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+      // =================================================================
+      // 3. KONFIGURACE A KONSTANTY
+      // =================================================================
+      const SUPABASE_URL = 'https://bprawiumolizfnhuigpf.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_OCC-K3xibSWzFoLgcQ7kyg_39EH34zQ';
+      const ADMIN_EMAIL = 'marek.horacek@alza.cz';
+      const DEFAULT_PASS = 'alza-tajne-heslo-2026';
+
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
       // =================================================================
       // 4. POMOCNÉ FUNKCE
@@ -3197,52 +3224,253 @@
         );
       }
 
-      function ProfilesView({ allProfiles, handleSaveClick }) {
+      function ProfilesView({ allProfiles, handleSaveClick, allRequests }) {
+        // Pomocná funkce pro barvu avatara podle jména
+        const getAvatarStyle = (name) => {
+          if (!name)
+            return { background: 'linear-gradient(135deg, #94a3b8, #64748b)' }; // Šedá pro neznámé
+
+          // Paleta jemných iOS gradientů
+          const gradients = [
+            'linear-gradient(135deg, #60a5fa, #3b82f6)', // Modrá
+            'linear-gradient(135deg, #a78bfa, #8b5cf6)', // Fialová
+            'linear-gradient(135deg, #34d399, #10b981)', // Zelená (Emerald)
+            'linear-gradient(135deg, #fb7185, #f43f5e)', // Růžová (Rose)
+            'linear-gradient(135deg, #f472b6, #db2777)', // Pink
+            'linear-gradient(135deg, #fb923c, #f97316)', // Oranžová
+          ];
+
+          // Vybereme barvu podle délky jména a prvního písmene (aby byla konzistentní)
+          const index = (name.length + name.charCodeAt(0)) % gradients.length;
+          return { background: gradients[index] };
+        };
+
+        const getUserBalance = (profile) => {
+          const userReqs = allRequests.filter(
+            (r) => r.user_id === profile.id && r.status === 'approved'
+          );
+          let usedVacationHours = 0;
+          let usedWhateverDays = 0;
+
+          userReqs.forEach((r) => {
+            const days = calculateWorkDays(r.date_from, r.date_to);
+            if (r.type === 'vacation') usedVacationHours += days * 8;
+            else if (r.type === 'half') usedVacationHours += 4;
+            else if (r.type === 'whatever') usedWhateverDays += days;
+          });
+
+          return {
+            vacLeft: (profile.vacation_limit || 160) - usedVacationHours,
+            vacTotal: profile.vacation_limit || 160,
+            whatLeft: (profile.whatever_limit || 5) - usedWhateverDays,
+            whatTotal: profile.whatever_limit || 5,
+          };
+        };
+
         return (
-          <div className="ios-list-card">
-            {/* --- HLAVIČKA --- */}
-            <div className="ios-list-header">
-              <span style={{ fontSize: '24px' }}>👤</span>
-              <div>
-                <div className="ios-header-title small">
-                  Správa profilů a limitů
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}
+          >
+            {/* === 1. KARTA: PŘEHLED ZŮSTATKŮ === */}
+            <div className="ios-list-card">
+              <div className="ios-list-header" style={{ marginBottom: 15 }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    background: '#e0f2fe',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                  }}
+                >
+                  📊
                 </div>
-                <div className="ios-header-subtitle">
-                  Editace jmen, narozenin, oddělení a ročních absencí
+                <div>
+                  <div
+                    className="ios-header-title small"
+                    style={{ color: '#0369a1' }}
+                  >
+                    Zůstatky týmu
+                  </div>
+                  <div className="ios-header-subtitle">
+                    Aktuální stav čerpání
+                  </div>
                 </div>
+              </div>
+
+              {/* Hlavička tabulky */}
+              <div
+                style={{
+                  display: 'flex',
+                  padding: '0 10px 10px 10px',
+                  borderBottom: '2px solid rgba(0,0,0,0.05)',
+                  marginBottom: 10,
+                  color: '#94a3b8',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                <div style={{ flex: 1.5 }}>Jméno</div>
+                <div style={{ flex: 1, textAlign: 'center' }}>Dovolená</div>
+                <div style={{ flex: 1, textAlign: 'center' }}>Whatever</div>
+              </div>
+
+              <div className="ios-list-container">
+                {allProfiles.map((p) => {
+                  const bal = getUserBalance(p);
+                  const vacColor =
+                    bal.vacLeft / bal.vacTotal < 0.2 ? '#ef4444' : '#0ea5e9';
+                  const vacBg =
+                    bal.vacLeft / bal.vacTotal < 0.2 ? '#fee2e2' : '#e0f2fe';
+                  const whatColor = bal.whatLeft === 0 ? '#d946ef' : '#a855f7';
+                  const whatBg = bal.whatLeft === 0 ? '#fae8ff' : '#f3e8ff';
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="ios-list-row"
+                      style={{ padding: '12px 5px' }}
+                    >
+                      {/* Avatar + Jméno */}
+                      <div
+                        style={{
+                          flex: 1.5,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {/* ✅ NOVÝ AVATAR */}
+                        <div
+                          className="ios-avatar-circle small"
+                          style={getAvatarStyle(p.full_name)}
+                        >
+                          {p.full_name ? p.full_name.charAt(0) : '?'}
+                        </div>
+                        <div
+                          style={{
+                            fontWeight: 600,
+                            fontSize: 14,
+                            color: '#334155',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {p.full_name}
+                        </div>
+                      </div>
+
+                      {/* Čísla */}
+                      <div
+                        style={{
+                          flex: 1,
+                          display: 'flex',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <div
+                          style={{
+                            background: vacBg,
+                            color: vacColor,
+                            padding: '4px 10px',
+                            borderRadius: 8,
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            minWidth: 60,
+                            textAlign: 'center',
+                          }}
+                        >
+                          {bal.vacLeft} h
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          flex: 1,
+                          display: 'flex',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <div
+                          style={{
+                            background: whatBg,
+                            color: whatColor,
+                            padding: '4px 10px',
+                            borderRadius: 8,
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            minWidth: 50,
+                            textAlign: 'center',
+                          }}
+                        >
+                          {bal.whatLeft}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* --- SEZNAM UŽIVATELŮ K EDITACI --- */}
-            <div className="ios-list-container">
-              {allProfiles.map((p) => (
+            {/* === 2. KARTA: EDITACE LIMITŮ === */}
+            <div className="ios-list-card">
+              <div className="ios-list-header">
                 <div
-                  key={p.id}
-                  className="ios-list-row"
-                  style={{ alignItems: 'flex-start', padding: '20px 5px' }}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    background: '#f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                  }}
                 >
-                  {/* LEVÁ ČÁST: Avatar + Jméno + Oddělení */}
+                  ⚙️
+                </div>
+                <div>
+                  <div className="ios-header-title small">
+                    Nastavení profilů
+                  </div>
+                  <div className="ios-header-subtitle">Editace údajů</div>
+                </div>
+              </div>
+
+              <div className="ios-list-container">
+                {allProfiles.map((p) => (
                   <div
-                    className="ios-list-col main-info"
-                    style={{ gap: 15, alignItems: 'flex-start', flex: 1.5 }}
+                    key={p.id}
+                    className="ios-list-row"
+                    style={{ alignItems: 'flex-start', padding: '15px 5px' }}
                   >
-                    <div className="user-avatar">
-                      {p.full_name ? p.full_name.charAt(0).toUpperCase() : '?'}
-                    </div>
+                    {/* LEVÁ ČÁST */}
                     <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 10,
-                        width: '100%',
-                      }}
+                      className="ios-list-col main-info"
+                      style={{ gap: 15, alignItems: 'flex-start', flex: 1.5 }}
                     >
-                      {/* Editace jména */}
+                      {/* ✅ NOVÝ AVATAR (VĚTŠÍ) */}
+                      <div
+                        className="ios-avatar-circle"
+                        style={getAvatarStyle(p.full_name)}
+                      >
+                        {p.full_name
+                          ? p.full_name.charAt(0).toUpperCase()
+                          : '?'}
+                      </div>
+
                       <div
                         style={{
                           display: 'flex',
-                          gap: 6,
-                          alignItems: 'center',
+                          flexDirection: 'column',
+                          gap: 8,
+                          width: '100%',
                         }}
                       >
                         <input
@@ -3256,151 +3484,89 @@
                             textAlign: 'left',
                             background: 'transparent',
                             border: 'none',
-                            borderBottom: '1px solid transparent',
-                            padding: '4px 0',
+                            padding: '0',
                             boxShadow: 'none',
                           }}
-                          placeholder="Jméno a příjmení"
-                          onFocus={(e) =>
-                            (e.target.style.borderBottom = '1px solid #6366f1')
-                          }
-                          onBlur={(e) =>
-                            (e.target.style.borderBottom =
-                              '1px solid transparent')
-                          }
+                          placeholder="Jméno"
                         />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() => handleSaveClick(p.id, 'full_name')}
-                          title="Uložit jméno"
-                        >
-                          💾
-                        </button>
-                      </div>
-                      {/* Editace oddělení */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: 6,
-                          alignItems: 'center',
-                        }}
-                      >
-                        <input
-                          type="text"
-                          id={`{p.id}-department`}
-                          defaultValue={p.department}
-                          className="ios-table-input"
-                          style={{
-                            fontSize: 13,
-                            color: '#64748b',
-                            textAlign: 'left',
-                            width: '140px',
-                          }}
-                          placeholder="Oddělení"
-                        />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() => handleSaveClick(p.id, 'department')}
-                          title="Uložit oddělení"
-                        >
-                          💾
-                        </button>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <input
+                            type="text"
+                            id={`${p.id}-department`}
+                            defaultValue={p.department}
+                            className="ios-table-input"
+                            style={{
+                              fontSize: 13,
+                              color: '#64748b',
+                              textAlign: 'left',
+                              width: '100%',
+                              background: 'rgba(255,255,255,0.5)',
+                            }}
+                            placeholder="Oddělení"
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() => handleSaveClick(p.id, 'full_name')}
+                            title="Uložit jméno"
+                          >
+                            💾
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* PRAVÁ ČÁST: Data a Limity */}
-                  <div
-                    className="ios-list-col admin-actions"
-                    style={{
-                      gap: 15,
-                      flex: 2,
-                      justifyContent: 'flex-end',
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    {/* Datum narození */}
-                    <div className="ios-limit-group">
-                      <span className="ios-limit-label">Datum narození</span>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
-                      >
-                        <input
-                          type="date"
-                          id={`{p.id}-birth_date`}
-                          defaultValue={p.birth_date}
-                          className="ios-table-input"
-                          style={{ width: 120 }}
-                        />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() => handleSaveClick(p.id, 'birth_date')}
-                        >
-                          💾
-                        </button>
+                    {/* PRAVÁ ČÁST */}
+                    <div
+                      className="ios-list-col admin-actions"
+                      style={{
+                        gap: 10,
+                        flex: 2,
+                        justifyContent: 'flex-end',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <div className="ios-limit-group">
+                        <span className="ios-limit-label">Nar.</span>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <input
+                            type="date"
+                            id={`${p.id}-birth_date`}
+                            defaultValue={p.birth_date}
+                            className="ios-table-input"
+                            style={{ width: 105 }}
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() => handleSaveClick(p.id, 'birth_date')}
+                          >
+                            💾
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    {/* Limit Dovolené */}
-                    <div className="ios-limit-group">
-                      <span className="ios-limit-label">Dovolená (h)</span>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
-                      >
-                        <input
-                          type="number"
-                          id={`{p.id}-vacation_limit`}
-                          defaultValue={p.vacation_limit}
-                          className="ios-table-input"
-                          style={{ width: 60 }}
-                        />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() =>
-                            handleSaveClick(p.id, 'vacation_limit')
-                          }
-                        >
-                          💾
-                        </button>
-                      </div>
-                    </div>
-                    {/* Limit Whatever */}
-                    <div className="ios-limit-group">
-                      <span className="ios-limit-label">Whatever</span>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
-                      >
-                        <input
-                          type="number"
-                          id={`{p.id}-whatever_limit`}
-                          defaultValue={p.whatever_limit}
-                          className="ios-table-input"
-                          style={{ width: 50 }}
-                        />
-                        <button
-                          className="btn-icon-save"
-                          onClick={() =>
-                            handleSaveClick(p.id, 'whatever_limit')
-                          }
-                        >
-                          💾
-                        </button>
+                      <div className="ios-limit-group">
+                        <span className="ios-limit-label">Limit (h)</span>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <input
+                            type="number"
+                            id={`${p.id}-vacation_limit`}
+                            defaultValue={p.vacation_limit}
+                            className="ios-table-input"
+                            style={{ width: 50 }}
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() =>
+                              handleSaveClick(p.id, 'vacation_limit')
+                            }
+                          >
+                            💾
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         );
@@ -3795,6 +3961,7 @@
               style={{
                 background: 'rgba(255,255,255,0.8)',
                 backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
                 padding: '20px',
                 borderRadius: '22px',
                 border: '1px solid rgba(255,255,255,0.5)',
@@ -3803,25 +3970,30 @@
               }}
             >
               <div
+                className="redphone-icon-animate"
                 style={{
                   width: 50,
                   height: 50,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #ef4444, #b91c1c)',
+                  borderRadius: '50%', // Zůstává kolečko
+                  // ZMĚNA: Velmi světlý růžový gradient (téměř bílá), aby ikonka vynikla
+                  background:
+                    'linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)',
+                  border: '1px solid #fecdd3', // Jemný růžový okraj
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '24px',
-                  boxShadow: '0 8px 16px rgba(220, 38, 38, 0.3)',
+                  // ZMĚNA: Sytě červená barva ikonky pro maximální kontrast
+                  color: '#b91c1c',
+                  boxShadow: '0 4px 12px rgba(225, 29, 72, 0.15)',
                 }}
-                className="redphone-icon-animate"
               >
                 ☎️
               </div>
               <div>
                 <div
                   className="ios-header-title small"
-                  style={{ color: '#b91c1c' }}
+                  style={{ color: '#9f1239' }}
                 >
                   Redphone 2026
                 </div>
@@ -6047,6 +6219,7 @@
               <ProfilesView
                 allProfiles={allProfiles}
                 handleSaveClick={handleSaveClick}
+                allRequests={requests}
               />
             )}
 
