@@ -2223,6 +2223,184 @@
           display: none;
         }
       }
+
+      /* ==========================================
+   🔴 REDPHONE STYLY (iOS URGENT GLASS)
+   ========================================== */
+      .redphone-card-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding-bottom: 40px;
+      }
+
+      .rp-week-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+          box-shadow 0.2s;
+      }
+
+      /* Aktivní týden (právě teď) */
+      .rp-week-card.current-week {
+        background: linear-gradient(
+          135deg,
+          rgba(254, 242, 242, 0.9) 0%,
+          rgba(255, 255, 255, 0.9) 100%
+        );
+        border: 1px solid #fecaca;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15),
+          0 10px 25px rgba(239, 68, 68, 0.15);
+        transform: scale(1.02);
+        z-index: 2;
+      }
+
+      /* Indikátor "Tento týden" */
+      .rp-current-badge {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: #ef4444;
+        color: white;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 99px;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        letter-spacing: 0.5px;
+      }
+
+      /* Levá část: Číslo týdne a datum */
+      .rp-date-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .rp-week-num {
+        font-size: 13px;
+        text-transform: uppercase;
+        color: #94a3b8;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+      }
+
+      .rp-week-range {
+        font-size: 15px;
+        font-weight: 600;
+        color: #334155;
+      }
+
+      .current-week .rp-week-num {
+        color: #ef4444;
+      }
+      .current-week .rp-week-range {
+        color: #1e293b;
+        font-weight: 700;
+      }
+
+      /* Pravá část: Uživatel (Dropdown Trigger) */
+      .rp-user-select-wrapper {
+        position: relative;
+        min-width: 140px;
+      }
+
+      /* Skutečný select, který je neviditelný, ale klikatelný přes celý button */
+      .rp-hidden-select {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      /* Vizuální podoba tlačítka pro výběr */
+      .rp-user-display {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        padding: 8px 12px;
+        border-radius: 14px;
+        transition: all 0.2s;
+        justify-content: flex-start;
+      }
+
+      .current-week .rp-user-display {
+        background: white;
+        border-color: #fca5a5;
+      }
+
+      .rp-user-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      /* Barva avatara, když je někdo vybrán */
+      .rp-user-avatar.active {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+      }
+
+      .rp-user-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 110px;
+      }
+
+      .rp-placeholder {
+        color: #94a3b8;
+        font-style: italic;
+        font-weight: 500;
+        font-size: 13px;
+      }
+
+      /* Animace pulzování pro telefon - JEMNĚJŠÍ iOS VERZE */
+      @keyframes pulse-red {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2);
+        }
+        70% {
+          transform: scale(1.08);
+          box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        }
+      }
+
+      .redphone-icon-animate {
+        animation: pulse-red 2s infinite;
+      }
     </style>
   </head>
   <body>
@@ -2503,6 +2681,49 @@
           .filter(Boolean);
         upcoming.sort((a, b) => a.diffDays - b.diffDays);
         return upcoming.length > 0 ? upcoming[0] : null;
+      };
+
+      // === POMOCNÉ FUNKCE PRO REDPHONE ===
+      const getWeeksInYear = (year) => {
+        const weeks = [];
+        // První den roku
+        let d = new Date(year, 0, 1);
+        // Najdi první pondělí
+        while (d.getDay() !== 1) {
+          d.setDate(d.getDate() + 1);
+        }
+
+        // Generuj 52 (nebo 53) týdnů
+        for (let i = 1; i <= 52; i++) {
+          const start = new Date(d);
+          const end = new Date(d);
+          end.setDate(end.getDate() + 6);
+
+          // Formátování: 13. 3.
+          const dateRange = `${start.getDate()}. ${
+            start.getMonth() + 1
+          }. — ${end.getDate()}. ${end.getMonth() + 1}.`;
+
+          weeks.push({
+            weekNum: i,
+            start: start,
+            end: end,
+            range: dateRange,
+            year: year,
+          });
+
+          // Posun o týden
+          d.setDate(d.getDate() + 7);
+        }
+        return weeks;
+      };
+
+      // Zjistí aktuální číslo týdne
+      const getCurrentWeekNumber = () => {
+        const current = new Date();
+        const start = new Date(current.getFullYear(), 0, 1);
+        const days = Math.floor((current - start) / (24 * 60 * 60 * 1000));
+        return Math.ceil(days / 7);
       };
 
       // =================================================================
@@ -3026,7 +3247,7 @@
                       >
                         <input
                           type="text"
-                          id={`{p.id}-full_name`}
+                          id={`${p.id}-full_name`}
                           defaultValue={p.full_name}
                           className="ios-table-input"
                           style={{
@@ -3470,6 +3691,235 @@
         }, [value, duration]);
 
         return <span>{count}</span>;
+      }
+
+      function RedphoneView({ profiles, myProfile }) {
+        const [schedule, setSchedule] = React.useState([]);
+        const [loading, setLoading] = React.useState(true);
+        const currentYear = 2026; // Nebo new Date().getFullYear()
+        const currentWeek = getCurrentWeekNumber();
+
+        // Reference pro automatické scrollování na aktuální týden
+        const currentWeekRef = React.useRef(null);
+
+        React.useEffect(() => {
+          fetchSchedule();
+        }, []);
+
+        // Po načtení a vykreslení scrollujeme na aktuální týden
+        React.useEffect(() => {
+          if (!loading && currentWeekRef.current) {
+            currentWeekRef.current.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+          }
+        }, [loading]);
+
+        const fetchSchedule = async () => {
+          setLoading(true);
+          const { data, error } = await supabase
+            .from('redphone_schedule')
+            .select('*')
+            .eq('year', currentYear);
+
+          if (data) setSchedule(data);
+          setLoading(false);
+        };
+
+        const handleAssign = async (weekNum, userId) => {
+          // Optimistický update UI (hned to změníme v Reactu)
+          const newEntry = {
+            year: currentYear,
+            week_number: weekNum,
+            user_id: userId,
+          };
+
+          // Najdeme, zda už záznam existuje v lokálním state
+          const existingIndex = schedule.findIndex(
+            (s) => s.week_number === weekNum && s.year === currentYear
+          );
+          let newSchedule = [...schedule];
+
+          if (existingIndex >= 0) {
+            if (userId === '') {
+              // Pokud uživatel vybral "Nikdo", záznam smažeme z pole
+              newSchedule.splice(existingIndex, 1);
+            } else {
+              newSchedule[existingIndex] = {
+                ...newSchedule[existingIndex],
+                user_id: userId,
+              };
+            }
+          } else if (userId !== '') {
+            newSchedule.push(newEntry);
+          }
+          setSchedule(newSchedule);
+
+          // Update DB
+          if (userId === '') {
+            // Smazání
+            await supabase
+              .from('redphone_schedule')
+              .delete()
+              .eq('year', currentYear)
+              .eq('week_number', weekNum);
+          } else {
+            // Upsert (Vložení nebo aktualizace)
+            const { error } = await supabase
+              .from('redphone_schedule')
+              .upsert(newEntry, { onConflict: 'year,week_number' });
+
+            if (error) alert('Chyba při ukládání: ' + error.message);
+          }
+        };
+
+        const weeks = React.useMemo(
+          () => getWeeksInYear(currentYear),
+          [currentYear]
+        );
+
+        return (
+          <div
+            className="ios-list-card"
+            style={{
+              background: 'transparent',
+              boxShadow: 'none',
+              border: 'none',
+              padding: 0,
+            }}
+          >
+            {/* --- HEADER --- */}
+            <div
+              className="ios-list-header"
+              style={{
+                background: 'rgba(255,255,255,0.8)',
+                backdropFilter: 'blur(20px)',
+                padding: '20px',
+                borderRadius: '22px',
+                border: '1px solid rgba(255,255,255,0.5)',
+                marginBottom: '25px',
+                boxShadow: '0 10px 30px rgba(220, 38, 38, 0.08)',
+              }}
+            >
+              <div
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #ef4444, #b91c1c)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  boxShadow: '0 8px 16px rgba(220, 38, 38, 0.3)',
+                }}
+                className="redphone-icon-animate"
+              >
+                ☎️
+              </div>
+              <div>
+                <div
+                  className="ios-header-title small"
+                  style={{ color: '#b91c1c' }}
+                >
+                  Redphone 2026
+                </div>
+                <div className="ios-header-subtitle">
+                  Rozpis pohotovostních služeb
+                </div>
+              </div>
+            </div>
+
+            {/* --- LIST TÝDNŮ --- */}
+            <div className="redphone-card-container">
+              {weeks.map((week) => {
+                const isCurrent = week.weekNum === currentWeek;
+                const assignedRecord = schedule.find(
+                  (s) => s.week_number === week.weekNum
+                );
+                const assignedUser = assignedRecord
+                  ? profiles.find((p) => p.id === assignedRecord.user_id)
+                  : null;
+
+                return (
+                  <div
+                    key={week.weekNum}
+                    className={`rp-week-card ${
+                      isCurrent ? 'current-week' : ''
+                    }`}
+                    ref={isCurrent ? currentWeekRef : null}
+                  >
+                    {isCurrent && (
+                      <div className="rp-current-badge">Tento týden</div>
+                    )}
+
+                    {/* LEVÁ STRANA: Datum */}
+                    <div className="rp-date-group">
+                      <div className="rp-week-num">Týden {week.weekNum}</div>
+                      <div className="rp-week-range">{week.range}</div>
+                    </div>
+
+                    {/* PRAVÁ STRANA: Výběr člověka */}
+                    <div className="rp-user-select-wrapper">
+                      {/* Nativní select (neviditelný) */}
+                      <select
+                        className="rp-hidden-select"
+                        value={assignedRecord?.user_id || ''}
+                        onChange={(e) =>
+                          handleAssign(week.weekNum, e.target.value)
+                        }
+                      >
+                        <option value="">-- Nikdo --</option>
+                        {profiles.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.full_name}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Vizuální reprezentace */}
+                      <div className="rp-user-display">
+                        {assignedUser ? (
+                          <>
+                            <div className="rp-user-avatar active">
+                              {assignedUser.full_name.charAt(0)}
+                            </div>
+                            <div className="rp-user-name">
+                              {assignedUser.full_name.split(' ')[0]}{' '}
+                              {/* Jen křestní pro úsporu místa */}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="rp-user-avatar">?</div>
+                            <div className="rp-placeholder">Vybrat...</div>
+                          </>
+                        )}
+                        {/* Šipka dolů (mini) */}
+                        <svg
+                          width="10"
+                          height="6"
+                          viewBox="0 0 10 6"
+                          fill="none"
+                          style={{ marginLeft: 'auto', opacity: 0.5 }}
+                        >
+                          <path
+                            d="M1 1L5 5L9 1"
+                            stroke="#334155"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
       }
 
       // =================================================================
@@ -4305,6 +4755,14 @@
                     onClick={() => setView('year')}
                   >
                     📅 <span className="nav-text">Kalendář</span>
+                  </button>
+                  <button
+                    className={`ios-nav-button ${
+                      view === 'redphone' ? 'active' : ''
+                    }`}
+                    onClick={() => setView('redphone')}
+                  >
+                    ☎️ <span className="nav-text">Redphone</span>
                   </button>
                   <button
                     className={`ios-nav-button ${
@@ -5764,6 +6222,10 @@
                 allRequests={requests}
               />
             )}
+            {view === 'redphone' && (
+              <RedphoneView profiles={allProfiles} myProfile={myProfile} />
+            )}
+            {/* ⬆️⬆️ KONEC VKLÁDÁNÍ ⬆️⬆️ */}
           </div>
         );
       }
