@@ -981,41 +981,6 @@
       }
 
       /* --- 2. Nová iOS Navigace --- */
-      .ios-nav-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .ios-nav-container {
-        display: flex;
-        align-items: center;
-        background: rgba(235, 235, 240, 0.7); /* Světle šedé pozadí */
-        border-radius: 999px; /* Plně zakulacené rohy */
-        padding: 5px;
-        border: 1px solid rgba(0, 0, 0, 0.04);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      }
-
-      .ios-nav-button {
-        background: transparent; /* Průhledné pozadí */
-        border: none;
-        border-radius: 999px;
-        padding: 8px 16px;
-        font-size: 15px;
-        font-weight: 600;
-        color: #334155;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
-        box-shadow: none; /* Reset stínu */
-        width: auto; /* Reset šířky */
-      }
 
       .ios-nav-button:hover {
         background: rgba(0, 0, 0, 0.05); /* Jemné zvýraznění při najetí */
@@ -1030,14 +995,73 @@
         transform: scale(1.02); /* Lehké zvětšení */
       }
 
-      /* Skryjeme texty na mobilních zařízeních pro úsporu místa */
-      @media (max-width: 768px) {
-        .nav-text {
-          display: none;
-        }
-        .ios-nav-button {
-          padding: 8px 10px;
-        }
+      /* ====================================================
+   FINÁLNÍ UNIVERZÁLNÍ NAVIGACE (iOS STYLE)
+   ==================================================== */
+
+      /* --- 1. Skleněný obal navigace (NESMAZAT!) --- */
+      .ios-nav-container {
+        display: flex;
+        align-items: center;
+        background: rgba(235, 235, 240, 0.7); /* Světle šedé pozadí */
+        border-radius: 999px; /* Plně zakulacené rohy */
+        padding: 5px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      /* --- 2. Chování navigačních tlačítek (nahrazuje všechny staré verze) --- */
+
+      /* Základní styl tlačítka (průhledné, se zakulacenými rohy) */
+      .ios-nav-button {
+        background: transparent;
+        border: none;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #334155;
+        cursor: pointer;
+        transition: all 0.25s ease; /* Plynulý přechod pro všechny změny */
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        box-shadow: none;
+        width: auto;
+
+        /* VÝCHOZÍ STAV (jen ikona): menší padding */
+        padding: 8px 12px;
+      }
+
+      /* Skrytí textového popisku ve výchozím stavu */
+      .ios-nav-button .nav-text {
+        display: none;
+      }
+
+      /* Jemné zvýraznění při najetí myší (kromě aktivního tlačítka) */
+      .ios-nav-button:not(.active):hover {
+        background: rgba(0, 0, 0, 0.05);
+        transform: none;
+      }
+
+      /* --- 3. Kouzlo pro AKTIVNÍ tlačítko --- */
+
+      /* Styl pro aktivní tlačítko (bílé, se stínem) */
+      .ios-nav-button.active {
+        background: #ffffff;
+        color: #0b1220;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.05);
+        transform: scale(1.02);
+
+        /* AKTIVNÍ STAV (ikona + text): vrátíme větší padding */
+        padding: 8px 16px;
+      }
+
+      /* Zobrazení textu POUZE u aktivního tlačítka */
+      .ios-nav-button.active .nav-text {
+        display: inline;
       }
 
       /* --- 3. Samostatné tlačítko pro odhlášení --- */
@@ -4153,6 +4177,8 @@
         const [loading, setLoading] = React.useState(false);
         const [workDaysCost, setWorkDaysCost] = React.useState(0);
         const [announcement, setAnnouncement] = React.useState('');
+        const [isAdminMenuOpen, setIsAdminMenuOpen] = React.useState(false);
+        const adminMenuRef = React.useRef(null);
         const [dateRangeInfo, setDateRangeInfo] = React.useState(null);
 
         // --- ZMĚNA ZAČÍNÁ ZDE ---
@@ -4920,11 +4946,15 @@
                 }}
               >
                 <div className="ios-nav-container">
+                  {/* --- Tlačítka viditelná pro všechny --- */}
                   <button
                     className={`ios-nav-button ${
                       view === 'dashboard' ? 'active' : ''
                     }`}
-                    onClick={() => setView('dashboard')}
+                    onClick={() => {
+                      setView('dashboard');
+                      setIsAdminMenuOpen(false);
+                    }}
                   >
                     🏠 <span className="nav-text">Přehled</span>
                   </button>
@@ -4932,43 +4962,21 @@
                     className={`ios-nav-button ${
                       view === 'requests' ? 'active' : ''
                     }`}
-                    onClick={() => setView('requests')}
+                    onClick={() => {
+                      setView('requests');
+                      setIsAdminMenuOpen(false);
+                    }}
                   >
                     📋 <span className="nav-text">Žádosti</span>
                   </button>
-                  {isAdmin && (
-                    <>
-                      <button
-                        className={`ios-nav-button ${
-                          view === 'team' ? 'active' : ''
-                        }`}
-                        onClick={() => setView('team')}
-                      >
-                        🔑 <span className="nav-text">Správa</span>
-                      </button>
-                      <button
-                        className={`ios-nav-button ${
-                          view === 'profiles' ? 'active' : ''
-                        }`}
-                        onClick={() => setView('profiles')}
-                      >
-                        👤 <span className="nav-text">Profily</span>
-                      </button>
-                      <button
-                        className={`ios-nav-button ${
-                          view === 'balances' ? 'active' : ''
-                        }`}
-                        onClick={() => setView('balances')}
-                      >
-                        💰 <span className="nav-text">Zůstatky</span>
-                      </button>
-                    </>
-                  )}
                   <button
                     className={`ios-nav-button ${
                       view === 'year' ? 'active' : ''
                     }`}
-                    onClick={() => setView('year')}
+                    onClick={() => {
+                      setView('year');
+                      setIsAdminMenuOpen(false);
+                    }}
                   >
                     📅 <span className="nav-text">Kalendář</span>
                   </button>
@@ -4976,7 +4984,10 @@
                     className={`ios-nav-button ${
                       view === 'redphone' ? 'active' : ''
                     }`}
-                    onClick={() => setView('redphone')}
+                    onClick={() => {
+                      setView('redphone');
+                      setIsAdminMenuOpen(false);
+                    }}
                   >
                     ☎️ <span className="nav-text">Redphone</span>
                   </button>
@@ -4984,7 +4995,10 @@
                     className={`ios-nav-button ${
                       view === 'birthdays' ? 'active' : ''
                     }`}
-                    onClick={() => setView('birthdays')}
+                    onClick={() => {
+                      setView('birthdays');
+                      setIsAdminMenuOpen(false);
+                    }}
                   >
                     🎂 <span className="nav-text">Oslavy</span>
                   </button>
@@ -4992,10 +5006,59 @@
                     className={`ios-nav-button ${
                       view === 'report' ? 'active' : ''
                     }`}
-                    onClick={() => setView('report')}
+                    onClick={() => {
+                      setView('report');
+                      setIsAdminMenuOpen(false);
+                    }}
                   >
                     📊 <span className="nav-text">Statistiky</span>
                   </button>
+
+                  {/* --- Tlačítko pro administrátorské menu (zobrazí se jen adminovi) --- */}
+                  {isAdmin && (
+                    <div style={{ position: 'relative' }} ref={adminMenuRef}>
+                      <button
+                        className={`ios-nav-button ${
+                          ['team', 'profiles', 'balances'].includes(view)
+                            ? 'active'
+                            : ''
+                        }`}
+                        onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+                      >
+                        ⚙️ <span className="nav-text">Správa</span>
+                      </button>
+
+                      {/* Podmíněně renderované menu pro admina */}
+                      {isAdminMenuOpen && (
+                        <div className="admin-dropdown-menu">
+                          <a
+                            onClick={() => {
+                              setView('team');
+                              setIsAdminMenuOpen(false);
+                            }}
+                          >
+                            🔑 Správa přístupů
+                          </a>
+                          <a
+                            onClick={() => {
+                              setView('profiles');
+                              setIsAdminMenuOpen(false);
+                            }}
+                          >
+                            👤 Profily
+                          </a>
+                          <a
+                            onClick={() => {
+                              setView('balances');
+                              setIsAdminMenuOpen(false);
+                            }}
+                          >
+                            💰 Zůstatky
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <button
