@@ -2426,7 +2426,7 @@
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
         DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
       };
-
+      //
     </script>
 
     <script type="text/babel">
@@ -2444,6 +2444,21 @@
           storage: window.sessionStorage,
         },
       });
+      //
+    </script>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+      // =================================================================
+      // 3. KONFIGURACE A KONSTANTY
+      // =================================================================
+      const SUPABASE_URL = 'https://bprawiumolizfnhuigpf.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_OCC-K3xibSWzFoLgcQ7kyg_39EH34zQ';
+      const ADMIN_EMAIL = 'marek.horacek@alza.cz';
+      const DEFAULT_PASS = 'alza-tajne-heslo-2026';
+
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
       // =================================================================
       // 4. POMOCNÉ FUNKCE
@@ -3224,6 +3239,7 @@
           const index = (name.length + name.charCodeAt(0)) % gradients.length;
           return { background: gradients[index] };
         };
+
         const getUserBalance = (profile) => {
           const userReqs = allRequests.filter(
             (r) => r.user_id === profile.id && r.status === 'approved'
@@ -3243,6 +3259,7 @@
             whatTotal: profile.whatever_limit || 5,
           };
         };
+
         // Pomocná komponenta pro jeden editační řádek
         const EditRow = ({
           label,
@@ -3460,7 +3477,8 @@
                 })}
               </div>
             </div>
-            {/* === 2. KARTA: EDITACE LIMITŮ (FINÁLNÍ VERZE) === */}
+
+            {/* === 2. KARTA: EDITACE LIMITŮ A ROLÍ (FINÁLNÍ VERZE) === */}
             <div className="ios-list-card">
               <div className="ios-list-header">
                 <div
@@ -3481,7 +3499,9 @@
                   <div className="ios-header-title small">
                     Nastavení profilů
                   </div>
-                  <div className="ios-header-subtitle">Editace údajů</div>
+                  <div className="ios-header-subtitle">
+                    Editace údajů, týmů a rolí
+                  </div>
                 </div>
               </div>
               <div className="ios-list-container">
@@ -3506,6 +3526,7 @@
                           : '?'}
                       </div>
                     </div>
+
                     {/* 2. SLOUPEC: OSOBNÍ INFO (Uprostřed) */}
                     <div
                       style={{
@@ -3523,16 +3544,69 @@
                         placeholder="Jméno a příjmení"
                         width="210px"
                       />
-                      {/* Oddělení (Původní textové) */}
-                      <EditRow
-                        id={p.id}
-                        field="department"
-                        value={p.department}
-                        placeholder="Oddělení (Staré)"
-                        width="210px"
-                      />
 
-                      {/* ✅ NOVÉ: ODDĚLENÍ NEO (Select Box) */}
+                      {/* Department + Division (Vedle sebe pro úsporu místa) */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: 6,
+                          justifyContent: 'flex-end',
+                          marginBottom: 5,
+                        }}
+                      >
+                        <div style={{ position: 'relative' }}>
+                          <input
+                            type="text"
+                            id={`${p.id}-department`}
+                            defaultValue={p.department}
+                            placeholder="Oddělení"
+                            className="ios-table-input"
+                            style={{ width: '100px', height: '36px' }}
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() => handleSaveClick(p.id, 'department')}
+                            style={{
+                              position: 'absolute',
+                              right: -32,
+                              top: 4,
+                              width: 28,
+                              height: 28,
+                              background: 'transparent',
+                            }}
+                            title="Uložit"
+                          >
+                            💾
+                          </button>
+                        </div>
+                        <div style={{ position: 'relative', marginRight: 36 }}>
+                          <input
+                            type="text"
+                            id={`${p.id}-division`}
+                            defaultValue={p.division}
+                            placeholder="Divize"
+                            className="ios-table-input"
+                            style={{ width: '100px', height: '36px' }}
+                          />
+                          <button
+                            className="btn-icon-save"
+                            onClick={() => handleSaveClick(p.id, 'division')}
+                            style={{
+                              position: 'absolute',
+                              right: -32,
+                              top: 4,
+                              width: 28,
+                              height: 28,
+                              background: 'transparent',
+                            }}
+                            title="Uložit"
+                          >
+                            💾
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* TEAM SELECT (B2B, B2C, Retence) */}
                       <div
                         style={{
                           display: 'flex',
@@ -3543,8 +3617,8 @@
                         }}
                       >
                         <select
-                          id={`${p.id}-department_neo`}
-                          defaultValue={p.department_neo || ''}
+                          id={`${p.id}-team`}
+                          defaultValue={p.team || ''}
                           className="ios-table-input"
                           style={{
                             width: '210px',
@@ -3559,17 +3633,72 @@
                             height: '36px',
                           }}
                         >
-                          <option value="">-- Oddělení NEO --</option>
+                          <option value="">-- Vyber Tým --</option>
                           <option value="B2B">B2B</option>
                           <option value="B2C">B2C</option>
                           <option value="Retence">Retence</option>
                         </select>
                         <button
                           className="btn-icon-save"
-                          onClick={() =>
-                            handleSaveClick(p.id, 'department_neo')
-                          }
-                          title="Uložit"
+                          onClick={() => handleSaveClick(p.id, 'team')}
+                          title="Uložit Tým"
+                          style={{
+                            width: 36,
+                            height: 36,
+                            background: '#f1f5f9',
+                            color: '#6366f1',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          💾
+                        </button>
+                      </div>
+
+                      {/* ROLE SELECT (Teamleader / Specialista) */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          marginBottom: 8,
+                          justifyContent: 'flex-end',
+                        }}
+                      >
+                        <select
+                          id={`${p.id}-role`}
+                          defaultValue={p.role || 'Specialista'}
+                          className="ios-table-input"
+                          style={{
+                            width: '210px',
+                            textAlign: 'left',
+                            padding: '8px 12px',
+                            background:
+                              p.role === 'Teamleader'
+                                ? '#e0e7ff'
+                                : 'rgba(255,255,255,0.6)',
+                            // ZDE JE TA VISUÁLNÍ VYCHYTÁVKA (Fialový border pro Teamleadera):
+                            border:
+                              p.role === 'Teamleader'
+                                ? '2px solid #6366f1'
+                                : '1px solid rgba(0,0,0,0.1)',
+                            borderRadius: '8px',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: '#334155',
+                            height: '36px',
+                          }}
+                        >
+                          <option value="Specialista">Specialista</option>
+                          <option value="Teamleader">Teamleader</option>
+                        </select>
+                        <button
+                          className="btn-icon-save"
+                          onClick={() => handleSaveClick(p.id, 'role')}
+                          title="Uložit Roli"
                           style={{
                             width: 36,
                             height: 36,
@@ -3595,6 +3724,7 @@
                         width="210px"
                       />
                     </div>
+
                     {/* 3. SLOUPEC: LIMITY (Vpravo - 2 řádky pod sebou) */}
                     <div
                       style={{
