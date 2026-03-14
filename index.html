@@ -3247,11 +3247,84 @@
           };
         };
 
+        // Pomocná komponenta pro jeden editační řádek
+        const EditRow = ({
+          label,
+          id,
+          field,
+          value,
+          type = 'text',
+          width = '200px',
+          placeholder,
+        }) => (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8,
+            }}
+          >
+            {/* Label zobrazíme jen pokud je zadán (pro limity vpravo) */}
+            {label && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  color: '#94a3b8',
+                  width: 35,
+                  textTransform: 'uppercase',
+                  textAlign: 'right',
+                }}
+              >
+                {label}
+              </span>
+            )}
+
+            <input
+              type={type}
+              id={`${id}-${field}`}
+              defaultValue={value}
+              placeholder={placeholder}
+              className="ios-table-input"
+              style={{
+                width: width,
+                textAlign: 'left',
+                padding: '8px 12px',
+                background: 'rgba(255,255,255,0.6)',
+                border: '1px solid rgba(0,0,0,0.1)',
+                borderRadius: '8px',
+                fontSize: 14,
+                fontWeight: 600,
+                color: '#334155',
+                height: '36px', // Fixní výška pro všechny inputy
+              }}
+            />
+            <button
+              className="btn-icon-save"
+              onClick={() => handleSaveClick(id, field)}
+              title="Uložit"
+              style={{
+                width: 36,
+                height: 36, // Stejná výška jako input
+                background: '#f1f5f9',
+                color: '#6366f1',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              💾
+            </button>
+          </div>
+        );
+
         return (
           <div
             style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}
           >
-            {/* === 1. KARTA: PŘEHLED ZŮSTATKŮ (Beze změny, funguje dobře) === */}
+            {/* === 1. KARTA: PŘEHLED ZŮSTATKŮ === */}
             <div className="ios-list-card">
               <div className="ios-list-header" style={{ marginBottom: 15 }}>
                 <div
@@ -3393,7 +3466,7 @@
               </div>
             </div>
 
-            {/* === 2. KARTA: EDITACE LIMITŮ (OPRAVENO) === */}
+            {/* === 2. KARTA: EDITACE LIMITŮ (FINÁLNÍ VERZE) === */}
             <div className="ios-list-card">
               <div className="ios-list-header">
                 <div
@@ -3414,9 +3487,7 @@
                   <div className="ios-header-title small">
                     Nastavení profilů
                   </div>
-                  <div className="ios-header-subtitle">
-                    Klikni do pole pro editaci
-                  </div>
+                  <div className="ios-header-subtitle">Editace údajů</div>
                 </div>
               </div>
 
@@ -3426,21 +3497,13 @@
                     key={p.id}
                     className="ios-list-row"
                     style={{
-                      alignItems: 'flex-start',
-                      padding: '20px 5px',
-                      flexWrap: 'wrap', // Povolíme zalamování celého řádku na mobilech
-                      gap: '15px',
+                      alignItems: 'flex-start', // Zarovnáme nahoru
+                      padding: '20px 10px',
+                      borderBottom: '1px solid rgba(0,0,0,0.05)',
                     }}
                   >
-                    {/* LEVÁ ČÁST: Avatar + Jméno + Oddělení */}
-                    <div
-                      className="ios-list-col main-info"
-                      style={{
-                        gap: 15,
-                        alignItems: 'flex-start',
-                        flex: '1 1 300px', // Minimální šířka 300px, jinak se zalomí
-                      }}
-                    >
+                    {/* 1. SLOUPEC: AVATAR (Vlevo) */}
+                    <div style={{ marginRight: 20, paddingTop: 5 }}>
                       <div
                         className="ios-avatar-circle"
                         style={getAvatarStyle(p.full_name)}
@@ -3449,133 +3512,77 @@
                           ? p.full_name.charAt(0).toUpperCase()
                           : '?'}
                       </div>
-
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 8,
-                          width: '100%',
-                        }}
-                      >
-                        {/* Jméno - nyní s jemným okrajem, aby bylo vidět */}
-                        <div style={{ display: 'flex', gap: 6, width: '100%' }}>
-                          <input
-                            type="text"
-                            id={`${p.id}-full_name`}
-                            defaultValue={p.full_name}
-                            className="ios-table-input"
-                            style={{
-                              fontWeight: 700,
-                              fontSize: 15,
-                              textAlign: 'left',
-                              background: 'rgba(255,255,255,0.6)',
-                              border: '1px solid rgba(0,0,0,0.1)', // Viditelný okraj
-                              width: '100%',
-                            }}
-                            placeholder="Jméno"
-                          />
-                          <button
-                            className="btn-icon-save"
-                            onClick={() => handleSaveClick(p.id, 'full_name')}
-                            title="Uložit jméno"
-                          >
-                            💾
-                          </button>
-                        </div>
-
-                        {/* Oddělení */}
-                        <input
-                          type="text"
-                          id={`${p.id}-department`}
-                          defaultValue={p.department}
-                          className="ios-table-input"
-                          style={{
-                            fontSize: 13,
-                            color: '#64748b',
-                            textAlign: 'left',
-                            width: '100%',
-                            background: 'rgba(255,255,255,0.4)',
-                            border: '1px solid rgba(0,0,0,0.05)',
-                          }}
-                          placeholder="Oddělení (např. IT)"
-                        />
-                      </div>
                     </div>
 
-                    {/* PRAVÁ ČÁST: Data a Limity (Opraveno zalamování) */}
+                    {/* 2. SLOUPEC: OSOBNÍ INFO (Uprostřed - 3 řádky pod sebou) */}
                     <div
-                      className="ios-list-col admin-actions"
                       style={{
-                        gap: 10,
-                        flex: '1 1 auto',
-                        justifyContent: 'flex-start', // Zarovnáme doleva, pokud se zalomí
-                        flexWrap: 'wrap', // Povolíme zalamování inputů
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: 1,
+                        gap: 2,
                       }}
                     >
-                      {/* Datum narození */}
-                      <div className="ios-limit-group">
-                        <span className="ios-limit-label">Narozeniny</span>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <input
-                            type="date"
-                            id={`${p.id}-birth_date`}
-                            defaultValue={p.birth_date}
-                            className="ios-table-input"
-                            style={{ width: '110px' }} // Fixní šířka, aby neutekl
-                          />
-                          <button
-                            className="btn-icon-save"
-                            onClick={() => handleSaveClick(p.id, 'birth_date')}
-                          >
-                            💾
-                          </button>
-                        </div>
-                      </div>
+                      {/* Jméno */}
+                      <EditRow
+                        id={p.id}
+                        field="full_name"
+                        value={p.full_name}
+                        placeholder="Jméno a příjmení"
+                        width="210px"
+                      />
 
-                      {/* Limit Dovolená */}
-                      <div className="ios-limit-group">
-                        <span className="ios-limit-label">Dovolená (h)</span>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <input
-                            type="number"
-                            id={`${p.id}-vacation_limit`}
-                            defaultValue={p.vacation_limit}
-                            className="ios-table-input"
-                            style={{ width: '60px' }}
-                          />
-                          <button
-                            className="btn-icon-save"
-                            onClick={() =>
-                              handleSaveClick(p.id, 'vacation_limit')
-                            }
-                          >
-                            💾
-                          </button>
-                        </div>
-                      </div>
+                      {/* Oddělení */}
+                      <EditRow
+                        id={p.id}
+                        field="department"
+                        value={p.department}
+                        placeholder="Oddělení"
+                        width="210px"
+                      />
 
-                      {/* Limit Whatever (VRÁCENO ZPĚT) */}
-                      <div className="ios-limit-group">
-                        <span className="ios-limit-label">Whatever</span>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <input
-                            type="number"
-                            id={`${p.id}-whatever_limit`}
-                            defaultValue={p.whatever_limit}
-                            className="ios-table-input"
-                            style={{ width: '50px' }}
-                          />
-                          <button
-                            className="btn-icon-save"
-                            onClick={() =>
-                              handleSaveClick(p.id, 'whatever_limit')
-                            }
-                          >
-                            💾
-                          </button>
-                        </div>
-                      </div>
+                      {/* Datum narození (Stejná šířka, bez labelu) */}
+                      <EditRow
+                        id={p.id}
+                        field="birth_date"
+                        value={p.birth_date}
+                        type="date"
+                        width="210px"
+                      />
+                    </div>
+
+                    {/* 3. SLOUPEC: LIMITY (Vpravo - 2 řádky pod sebou) */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                        justifyContent: 'flex-start',
+                        gap: 2,
+                        paddingLeft: 15,
+                        borderLeft: '1px solid rgba(0,0,0,0.05)',
+                        height: '100%',
+                      }}
+                    >
+                      {/* Dovolená */}
+                      <EditRow
+                        label="DOV."
+                        id={p.id}
+                        field="vacation_limit"
+                        value={p.vacation_limit}
+                        type="number"
+                        width="60px"
+                      />
+
+                      {/* Whatever */}
+                      <EditRow
+                        label="WHT."
+                        id={p.id}
+                        field="whatever_limit"
+                        value={p.whatever_limit}
+                        type="number"
+                        width="60px"
+                      />
                     </div>
                   </div>
                 ))}
@@ -3584,6 +3591,7 @@
           </div>
         );
       }
+
       // ZMĚNA: Přejmenováno z TeamManagementView a zjednodušeno
       function AccessManagementView({
         form,
