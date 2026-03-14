@@ -3254,7 +3254,7 @@
           field,
           value,
           type = 'text',
-          width = '200px',
+          width = '200px', // Výchozí šířka inputu
           placeholder,
         }) => (
           <div
@@ -3263,6 +3263,7 @@
               alignItems: 'center',
               gap: 8,
               marginBottom: 8,
+              justifyContent: 'flex-end', // Zarovnáme obsah doprava
             }}
           >
             {/* Label zobrazíme jen pokud je zadán (pro limity vpravo) */}
@@ -3272,24 +3273,25 @@
                   fontSize: 10,
                   fontWeight: 800,
                   color: '#94a3b8',
-                  width: 35,
+                  // ZMĚNA: Zvětšeno z 35 na 70, aby se text vešel
+                  width: 70,
                   textTransform: 'uppercase',
-                  textAlign: 'right',
+                  textAlign: 'right', // Text zarovnaný k inputu
+                  whiteSpace: 'nowrap', // Zabrání zalomení textu
                 }}
               >
                 {label}
               </span>
             )}
-
             <input
               type={type}
-              id={`${id}-${field}`}
+              id={`${id}-${field}`} // Opravena syntaxe id
               defaultValue={value}
               placeholder={placeholder}
               className="ios-table-input"
               style={{
                 width: width,
-                textAlign: 'left',
+                textAlign: 'left', // Text uvnitř inputu vlevo (nebo center dle preference)
                 padding: '8px 12px',
                 background: 'rgba(255,255,255,0.6)',
                 border: '1px solid rgba(0,0,0,0.1)',
@@ -3297,7 +3299,7 @@
                 fontSize: 14,
                 fontWeight: 600,
                 color: '#334155',
-                height: '36px', // Fixní výška pro všechny inputy
+                height: '36px',
               }}
             />
             <button
@@ -3306,13 +3308,14 @@
               title="Uložit"
               style={{
                 width: 36,
-                height: 36, // Stejná výška jako input
+                height: 36,
                 background: '#f1f5f9',
                 color: '#6366f1',
                 borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0, // Aby se tlačítko nezmenšovalo
               }}
             >
               💾
@@ -3566,7 +3569,7 @@
                     >
                       {/* Dovolená */}
                       <EditRow
-                        label="DOVOLENÁ."
+                        label="DOVOLENÁ"
                         id={p.id}
                         field="vacation_limit"
                         value={p.vacation_limit}
