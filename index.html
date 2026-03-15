@@ -4526,51 +4526,43 @@
         };
 
         const handleUpdateProfile = async (userId, field, value) => {
-          if (!isAdmin) return;
-
+          if (!isAdmin) return false; // Změna: vrací false
           let newValue = value;
           if (field === 'vacation_limit' || field === 'whatever_limit') {
             newValue = parseInt(value);
             if (isNaN(newValue)) {
               alert('Chyba: Zadejte platné číslo.');
-              return;
+              return false; // Změna: vrací false
             }
           }
-
-          // KROK 1: Okamžitě aktualizujeme lokální stav v Reactu (optimistický update)
           const updatedProfiles = allProfiles.map((p) => {
             if (p.id === userId) {
-              // Našli jsme profil, který měníme. Vrátíme jeho kopii s upravenou hodnotou.
               return { ...p, [field]: newValue };
             }
-            // Ostatní profily vrátíme beze změny.
             return p;
           });
-          setAllProfiles(updatedProfiles); // Tím se okamžitě a správně překreslí UI.
-
-          // KROK 2: Až poté pošleme data do databáze na pozadí.
+          setAllProfiles(updatedProfiles);
           const { error } = await supabase
             .from('profiles')
             .update({ [field]: newValue })
             .eq('id', userId);
-
-          // KROK 3 (Pojistka): Pokud by uložení do databáze selhalo, upozorníme uživatele
-          // a pro jistotu načteme data znovu, aby se stav srovnal s realitou.
           if (error) {
             alert('Chyba při ukládání do databáze: ' + error.message);
-            fetchAllProfiles(); // Vrátíme se k "pravdě" z databáze
+            fetchAllProfiles();
+            return false; // Změna: vrací false při chybě
           }
+          return true; // Změna: vrací true při úspěchu
         };
 
         const handleSaveClick = async (userId, field) => {
           const inputId = `${userId}-${field}`;
           const value = document.getElementById(inputId).value;
-
-          // DŮLEŽITÉ: Použijeme 'await', abychom počkali na dokončení ukládání
-          await handleUpdateProfile(userId, field, value);
-
-          // Alert zobrazíme až poté, co je vše hotovo.
-          alert('✅ Uloženo!');
+          // Uložíme si výsledek (true/false) z ukládací funkce
+          const success = await handleUpdateProfile(userId, field, value);
+          // Zobrazíme alert, POUZE pokud bylo uložení úspěšné
+          if (success) {
+            alert('✅ Uloženo!');
+          }
         };
 
         const handleAddBirthdayPerson = async (e) => {
