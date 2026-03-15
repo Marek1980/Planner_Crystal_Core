@@ -4253,29 +4253,37 @@
         };
 
         React.useEffect(() => {
-          // 1. Zjistíme session jen jednou při startu.
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            if (session) {
-              // Načteme data jen při prvním načtení stránky.
-              initData(session);
-            }
-          });
-
-          // 2. Posluchač bude už jen aktualizovat session a nic víc.
+          // Nastavíme posluchače, který bude reagovat na změny stavu přihlášení.
           const {
             data: { subscription },
-          } = supabase.auth.onAuthStateChange((_event, session) => {
-            // Pouze nastavíme, zda je uživatel přihlášen, nebo ne.
-            // UŽ NIKDY NEVOLÁME initData() ANI setView()!
+          } = supabase.auth.onAuthStateChange((event, session) => {
+            
+            // Vždy jen aktualizujeme informaci o session (kdo je přihlášen).
             setSession(session);
+            
+            // Reagujeme POUZE na dvě klíčové události:
+            if (event === 'INITIAL_SESSION' && session) {
+              // Toto se stane jen jednou při prvním načtení stránky,
+              // pokud je uživatel už přihlášen.
+              initData(session);
+            } else if (event === 'SIGNED_IN') {
+              // Toto se stane jen při novém, aktivním přihlášení.
+              initData(session);
+              setView('dashboard');
+            } else if (event === 'SIGNED_OUT') {
+              // Při odhlášení vyčistíme data.
+              setMyProfile(null);
+              setAllProfiles([]);
+              setRequests([]);
+            }
+            // Pro všechny ostatní události (jako TOKEN_REFRESHED) se nestane nic.
           });
 
-          // 3. Úklid.
+          // Funkce pro úklid.
           return () => {
             subscription.unsubscribe();
           };
-        }, []); // Spustí se jen jednou.
+        }, []);
 
         React.useEffect(() => {
           if (form.from && form.to) {
