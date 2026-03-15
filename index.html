@@ -3418,9 +3418,25 @@
           type = 'text',
           options = null,
         }) => {
-          const isSpecialRole = field === 'role' && value === 'Teamleader';
+          // Krok 1: Identifikujeme speciální role
+          const isTeamleader = field === 'role' && value === 'Teamleader';
+          const isManager = field === 'role' && value === 'Manažer';
+
+          // Krok 2: Připravíme si styl, který přidáme v případě, že je to Manažer
+          const managerStyle = isManager
+            ? {
+                background: 'linear-gradient(135deg, #fffbeb, #fef3c7)', // Zlatavé pozadí
+                padding: '10px',
+                borderRadius: '12px',
+                border: '1px solid rgba(251, 191, 36, 0.4)',
+                boxShadow: '0 4px 15px rgba(234, 179, 8, 0.1)',
+                margin: '-10px -10px 12px -10px', // Negativní margin, aby to vyplnilo kartu
+              }
+            : {};
+
           return (
-            <div style={{ marginBottom: 12, width: '100%' }}>
+            // Krok 3: Spojíme původní styl s naším novým `managerStyle`
+            <div style={{ marginBottom: 12, width: '100%', ...managerStyle }}>
               <div
                 style={{
                   fontSize: '10px',
@@ -3591,7 +3607,7 @@
                       id={p.id}
                       field="role"
                       value={p.role}
-                      options={['Specialista', 'Teamleader']}
+                      options={['Specialista', 'Teamleader', 'Manažer']}
                     />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
