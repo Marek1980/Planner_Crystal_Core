@@ -4253,44 +4253,29 @@
         };
 
         React.useEffect(() => {
-          let isInitialLoad = true; // Vlajka pro první načtení
-
-          // 1. Nastavíme posluchače, který bude reagovat na změny.
-          const {
-            data: { subscription },
-          } = supabase.auth.onAuthStateChange((event, session) => {
-            // Vždy aktualizujeme informaci o session.
+          // 1. Zjistíme session jen jednou při startu.
+          supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
-
-            // A) Reagujeme POUZE na nové přihlášení (po zadání emailu).
-            if (event === 'SIGNED_IN') {
-              initData(session);
-              setView('dashboard');
-            }
-
-            // B) Reagujeme POUZE na odhlášení.
-            if (event === 'SIGNED_OUT') {
-              // Vyčistíme data.
-              setMyProfile(null);
-              setAllProfiles([]);
-              setRequests([]);
-            }
-
-            // C) Při prvním načtení stránky (INITIAL_SESSION) načteme data.
-            // a zároveň se ujistíme, že je to opravdu první načtení.
-            if (event === 'INITIAL_SESSION' && session && isInitialLoad) {
-              isInitialLoad = false; // Snížíme vlajku, aby se to už neopakovalo.
+            if (session) {
+              // Načteme data jen při prvním načtení stránky.
               initData(session);
             }
-
-            // Pro událost TOKEN_REFRESHED (návrat na záložku) se nestane NIC.
           });
 
-          // 2. Funkce pro úklid.
+          // 2. Posluchač bude už jen aktualizovat session a nic víc.
+          const {
+            data: { subscription },
+          } = supabase.auth.onAuthStateChange((_event, session) => {
+            // Pouze nastavíme, zda je uživatel přihlášen, nebo ne.
+            // UŽ NIKDY NEVOLÁME initData() ANI setView()!
+            setSession(session);
+          });
+
+          // 3. Úklid.
           return () => {
             subscription.unsubscribe();
           };
-        }, []);
+        }, []); // Spustí se jen jednou.
 
         React.useEffect(() => {
           if (form.from && form.to) {
