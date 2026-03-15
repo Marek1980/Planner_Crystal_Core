@@ -3389,7 +3389,7 @@
         );
       }
 
-      function ProfilesView({ allProfiles, handleSaveClick }) {
+      function ProfilesView({ allProfiles, handleSaveClick, isAdmin }) {
         const getAvatarStyle = (name) => {
           if (!name)
             return {
@@ -3406,7 +3406,6 @@
             'linear-gradient(45deg, #ec4899, #f472b6, #db2777)',
           ];
           const index = (name.length + name.charCodeAt(0)) % gradients.length;
-          // Přidáváme borderRadius přímo do stylu jako pojistku
           return { backgroundImage: gradients[index], borderRadius: '50%' };
         };
 
@@ -3418,38 +3417,30 @@
           type = 'text',
           options = null,
         }) => {
-          // KROK 1: Vytvoříme si "slovník" stylů pro jednotlivé role.
-          // Zde můžeme snadno přidávat další role a jejich barvy.
           const roleHighlightStyles = {
             Manažer: {
-              background: 'linear-gradient(135deg, #fffbeb, #fef3c7)', // Zlatavá
+              background: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
               border: '1px solid rgba(251, 191, 36, 0.4)',
               boxShadow: '0 4px 15px rgba(234, 179, 8, 0.1)',
             },
             Teamleader: {
-              background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', // Světle modrá
+              background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)',
               border: '1px solid rgba(59, 130, 246, 0.3)',
               boxShadow: '0 4px 15px rgba(59, 130, 246, 0.1)',
             },
-            // Zde můžete v budoucnu přidat např.: 'Ředitel': { background: '...' }
           };
-
-          // KROK 2: Zjistíme, zda pro aktuální roli existuje nějaký styl.
           const highlightSpecificStyle =
             field === 'role' && roleHighlightStyles[value];
-
-          // KROK 3: Vytvoříme finální styl. Pokud styl pro roli existuje, přidáme i layout triky.
           const finalHighlightStyle = highlightSpecificStyle
             ? {
-                ...highlightSpecificStyle, // Přidá specifické styly (zlatá/modrá)
+                ...highlightSpecificStyle,
                 padding: '10px',
                 borderRadius: '12px',
-                margin: '-10px -10px 12px -10px', // Trik pro roztažení pozadí
+                margin: '-10px -10px 12px -10px',
               }
-            : {}; // Pokud to není speciální role, nepřidá se žádný styl.
+            : {};
 
           return (
-            // KROK 4: Aplikujeme finální styl na hlavní div.
             <div
               style={{
                 marginBottom: 12,
@@ -3471,7 +3462,7 @@
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 {options ? (
                   <select
-                    id={`${id}-${field}`} // OPRAVENA SYNTAXE
+                    id={`${id}-${field}`}
                     defaultValue={value || ''}
                     className="ios-table-input"
                     style={{
@@ -3491,7 +3482,7 @@
                 ) : (
                   <input
                     type={type}
-                    id={`${id}-${field}`} // OPRAVENA SYNTAXE
+                    id={`${id}-${field}`}
                     defaultValue={value}
                     className="ios-table-input"
                     style={{
@@ -3570,7 +3561,6 @@
                       alignItems: 'center',
                     }}
                   >
-                    {/* ZDE JE OPRAVENÝ AVATAR */}
                     <div
                       className="ios-avatar-premium large"
                       style={{
@@ -4257,10 +4247,9 @@
           const {
             data: { subscription },
           } = supabase.auth.onAuthStateChange((event, session) => {
-            
             // Vždy jen aktualizujeme informaci o session (kdo je přihlášen).
             setSession(session);
-            
+
             // Reagujeme POUZE na dvě klíčové události:
             if (event === 'INITIAL_SESSION' && session) {
               // Toto se stane jen jednou při prvním načtení stránky,
@@ -4577,7 +4566,11 @@
         const handleSaveClick = async (userId, field) => {
           const inputId = `${userId}-${field}`;
           const value = document.getElementById(inputId).value;
+
+          // DŮLEŽITÉ: Použijeme 'await', abychom počkali na dokončení ukládání
           await handleUpdateProfile(userId, field, value);
+
+          // Alert zobrazíme až poté, co je vše hotovo.
           alert('✅ Uloženo!');
         };
 
