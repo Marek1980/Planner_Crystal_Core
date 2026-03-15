@@ -2424,7 +2424,6 @@
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
         DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
       };
-
     </script>
 
     <script type="text/babel">
@@ -4266,20 +4265,24 @@
           };
           init();
 
-          // Tento posluchač bude reagovat na změny stavu přihlášení
           const {
             data: { subscription },
           } = supabase.auth.onAuthStateChange((event, session) => {
-            setSession(session);
+            // Reagujeme POUZE na aktivní přihlášení a odhlášení.
+            // Ignorujeme tiché obnovení tokenu (TOKEN_REFRESHED).
 
-            if (session) {
-              // Vždy načteme čerstvá data, pokud existuje session
+            if (event === 'SIGNED_IN') {
+              setSession(session);
               initData(session);
+              setView('dashboard');
+            }
 
-              // Ale POUZE v případě, že se uživatel zrovna přihlásil, přesměrujeme ho
-              if (event === 'SIGNED_IN') {
-                setView('dashboard');
-              }
+            if (event === 'SIGNED_OUT') {
+              setSession(null);
+              // Vyčistíme data, aby nezůstala v aplikaci po odhlášení
+              setMyProfile(null);
+              setAllProfiles([]);
+              setRequests([]);
             }
           });
 
