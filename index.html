@@ -3418,25 +3418,45 @@
           type = 'text',
           options = null,
         }) => {
-          // Krok 1: Identifikujeme speciální role
-          const isTeamleader = field === 'role' && value === 'Teamleader';
-          const isManager = field === 'role' && value === 'Manažer';
+          // KROK 1: Vytvoříme si "slovník" stylů pro jednotlivé role.
+          // Zde můžeme snadno přidávat další role a jejich barvy.
+          const roleHighlightStyles = {
+            Manažer: {
+              background: 'linear-gradient(135deg, #fffbeb, #fef3c7)', // Zlatavá
+              border: '1px solid rgba(251, 191, 36, 0.4)',
+              boxShadow: '0 4px 15px rgba(234, 179, 8, 0.1)',
+            },
+            Teamleader: {
+              background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', // Světle modrá
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              boxShadow: '0 4px 15px rgba(59, 130, 246, 0.1)',
+            },
+            // Zde můžete v budoucnu přidat např.: 'Ředitel': { background: '...' }
+          };
 
-          // Krok 2: Připravíme si styl, který přidáme v případě, že je to Manažer
-          const managerStyle = isManager
+          // KROK 2: Zjistíme, zda pro aktuální roli existuje nějaký styl.
+          const highlightSpecificStyle =
+            field === 'role' && roleHighlightStyles[value];
+
+          // KROK 3: Vytvoříme finální styl. Pokud styl pro roli existuje, přidáme i layout triky.
+          const finalHighlightStyle = highlightSpecificStyle
             ? {
-                background: 'linear-gradient(135deg, #fffbeb, #fef3c7)', // Zlatavé pozadí
+                ...highlightSpecificStyle, // Přidá specifické styly (zlatá/modrá)
                 padding: '10px',
                 borderRadius: '12px',
-                border: '1px solid rgba(251, 191, 36, 0.4)',
-                boxShadow: '0 4px 15px rgba(234, 179, 8, 0.1)',
-                margin: '-10px -10px 12px -10px', // Negativní margin, aby to vyplnilo kartu
+                margin: '-10px -10px 12px -10px', // Trik pro roztažení pozadí
               }
-            : {};
+            : {}; // Pokud to není speciální role, nepřidá se žádný styl.
 
           return (
-            // Krok 3: Spojíme původní styl s naším novým `managerStyle`
-            <div style={{ marginBottom: 12, width: '100%', ...managerStyle }}>
+            // KROK 4: Aplikujeme finální styl na hlavní div.
+            <div
+              style={{
+                marginBottom: 12,
+                width: '100%',
+                ...finalHighlightStyle,
+              }}
+            >
               <div
                 style={{
                   fontSize: '10px',
@@ -3451,7 +3471,7 @@
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 {options ? (
                   <select
-                    id={`${id}-${field}`} // ✅ OPRAVENO: přidány složené závorky
+                    id={`${id}-${field}`} // OPRAVENA SYNTAXE
                     defaultValue={value || ''}
                     className="ios-table-input"
                     style={{
@@ -3471,7 +3491,7 @@
                 ) : (
                   <input
                     type={type}
-                    id={`${id}-${field}`} // ✅ OPRAVENO: přidány složené závorky
+                    id={`${id}-${field}`} // OPRAVENA SYNTAXE
                     defaultValue={value}
                     className="ios-table-input"
                     style={{
@@ -4191,21 +4211,7 @@
 
         // --- ZMĚNA ZAČÍNÁ ZDE ---
 
-        // 1. Přidán stav pro aktuální čas
-        const [currentTime, setCurrentTime] = React.useState(new Date());
-
-        // 2. Nový useEffect, který každou MINUTU aktualizuje čas
-        React.useEffect(() => {
-          const timer = setInterval(() => {
-            setCurrentTime(new Date());
-          }, 60000); // 60000 milisekund = 1 minuta
-          // Důležitý úklid po odpojení komponenty
-          return () => {
-            clearInterval(timer);
-          };
-        }, []); // Spustí se jen jednou při startu
-
-        // 3. Upravená funkce, aby přijímala datum jako argument
+        // 1. Upravená funkce, aby přijímala datum jako argument
         const getGreeting = (date) => {
           const h = date.getHours();
           if (h < 4) return 'Dobrou noc'; // 00:00 - 03:59
@@ -4951,27 +4957,10 @@
                     className="ios-header-title"
                     style={{ fontSize: '22px' }}
                   >
-                    {getGreeting(currentTime)},{' '}
+                    {getGreeting(new Date())},{' '}
                     {myProfile
                       ? getVocativeName(myProfile.full_name)
                       : 'Kolego'}{' '}
-                  </span>
-                </div>
-
-                {/* Elegantní datum a čas vpravo */}
-                <div className="datetime-container">
-                  <span className="datetime-date">
-                    {currentTime.toLocaleDateString('cs-CZ', {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                    })}
-                  </span>
-                  <span className="datetime-time">
-                    {currentTime.toLocaleTimeString('cs-CZ', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
                   </span>
                 </div>
               </div>
