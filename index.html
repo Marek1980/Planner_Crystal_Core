@@ -2424,6 +2424,7 @@
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
         DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
       };
+
     </script>
 
     <script type="text/babel">
@@ -4252,50 +4253,44 @@
         };
 
         React.useEffect(() => {
-          // Tato funkce se spustí jen jednou při načtení stránky
-          const init = async () => {
-            const {
-              data: { session },
-            } = await supabase.auth.getSession();
-            setSession(session);
-            if (session) {
-              initData(session);
-              // Zde už úmyslně nenastavujeme view, aby uživatel zůstal kde byl
-            }
-          };
-          init();
+          let isInitialLoad = true; // Vlajka pro první načtení
 
+          // 1. Nastavíme posluchače, který bude reagovat na změny.
           const {
             data: { subscription },
           } = supabase.auth.onAuthStateChange((event, session) => {
-            // Reagujeme POUZE na aktivní přihlášení a odhlášení.
-            // Ignorujeme tiché obnovení tokenu (TOKEN_REFRESHED).
+            // Vždy aktualizujeme informaci o session.
+            setSession(session);
 
+            // A) Reagujeme POUZE na nové přihlášení (po zadání emailu).
             if (event === 'SIGNED_IN') {
-              setSession(session);
               initData(session);
               setView('dashboard');
             }
 
+            // B) Reagujeme POUZE na odhlášení.
             if (event === 'SIGNED_OUT') {
-              setSession(null);
-              // Vyčistíme data, aby nezůstala v aplikaci po odhlášení
+              // Vyčistíme data.
               setMyProfile(null);
               setAllProfiles([]);
               setRequests([]);
             }
+
+            // C) Při prvním načtení stránky (INITIAL_SESSION) načteme data.
+            // a zároveň se ujistíme, že je to opravdu první načtení.
+            if (event === 'INITIAL_SESSION' && session && isInitialLoad) {
+              isInitialLoad = false; // Snížíme vlajku, aby se to už neopakovalo.
+              initData(session);
+            }
+
+            // Pro událost TOKEN_REFRESHED (návrat na záložku) se nestane NIC.
           });
 
-          // Funkce pro úklid po odpojení komponenty
+          // 2. Funkce pro úklid.
           return () => {
-            if (
-              subscription &&
-              typeof subscription.unsubscribe === 'function'
-            ) {
-              subscription.unsubscribe();
-            }
+            subscription.unsubscribe();
           };
-        }, []); // Prázdné pole znamená: "spusť tento celý useEffect jen jednou"
+        }, []);
 
         React.useEffect(() => {
           if (form.from && form.to) {
