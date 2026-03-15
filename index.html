@@ -3584,7 +3584,7 @@
                       id={p.id}
                       field="team"
                       value={p.team}
-                      options={['', 'B2B', 'B2C', 'Retence']}
+                      options={['', 'B2B', 'B2C', 'Retence', 'Vedení']}
                     />
                     <EditField
                       label="Role"
@@ -4178,12 +4178,11 @@
         // 1. Přidán stav pro aktuální čas
         const [currentTime, setCurrentTime] = React.useState(new Date());
 
-        // 2. Nový useEffect, který každou sekundu aktualizuje čas
+        // 2. Nový useEffect, který každou MINUTU aktualizuje čas
         React.useEffect(() => {
           const timer = setInterval(() => {
             setCurrentTime(new Date());
-          }, 1000); // Aktualizace každou sekundu
-
+          }, 60000); // 60000 milisekund = 1 minuta
           // Důležitý úklid po odpojení komponenty
           return () => {
             clearInterval(timer);
@@ -4232,6 +4231,7 @@
         };
 
         React.useEffect(() => {
+          // Tato funkce se spustí jen jednou při načtení stránky
           const init = async () => {
             const {
               data: { session },
@@ -4239,20 +4239,29 @@
             setSession(session);
             if (session) {
               initData(session);
-              setView('dashboard'); // ✅ PŘIDÁNO: Nastaví přehled při prvním načtení
+              // Zde už úmyslně nenastavujeme view, aby uživatel zůstal kde byl
             }
           };
           init();
+
+          // Tento posluchač bude reagovat na změny stavu přihlášení
           const {
             data: { subscription },
-          } = supabase.auth.onAuthStateChange((_event, session) => {
+          } = supabase.auth.onAuthStateChange((event, session) => {
             setSession(session);
+
             if (session) {
-              // Uživatel se právě přihlásil nebo mu byla obnovena session
+              // Vždy načteme čerstvá data, pokud existuje session
               initData(session);
-              setView('dashboard'); // ✅ PŘIDÁNO: Přesměruje na hlavní přehled
+
+              // Ale POUZE v případě, že se uživatel zrovna přihlásil, přesměrujeme ho
+              if (event === 'SIGNED_IN') {
+                setView('dashboard');
+              }
             }
           });
+
+          // Funkce pro úklid po odpojení komponenty
           return () => {
             if (
               subscription &&
@@ -4261,7 +4270,7 @@
               subscription.unsubscribe();
             }
           };
-        }, []);
+        }, []); // Prázdné pole znamená: "spusť tento celý useEffect jen jednou"
 
         React.useEffect(() => {
           if (form.from && form.to) {
@@ -4923,7 +4932,6 @@
                     {currentTime.toLocaleTimeString('cs-CZ', {
                       hour: '2-digit',
                       minute: '2-digit',
-                      second: '2-digit',
                     })}
                   </span>
                 </div>
