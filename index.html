@@ -1017,19 +1017,18 @@
         background: transparent;
         border: none;
         border-radius: 999px;
-        font-size: 15px;
+        font-size: 16px; /* Změna: Zvětšeno písmo a ikona */
         font-weight: 600;
         color: #334155;
         cursor: pointer;
         transition: all 0.25s ease;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px; /* Změna: Mírně zvětšená mezera mezi ikonou a textem */
         white-space: nowrap;
         box-shadow: none;
         width: auto;
-        /* VÝCHOZÍ STAV (jen ikona): menší padding */
-        padding: 8px 12px;
+        padding: 10px 14px; /* Změna: Zvětšené odsazení pro více "vzduchu" */
       }
 
       /* Skrytí textového popisku ve výchozím stavu */
@@ -1049,8 +1048,8 @@
         color: #0b1220;
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.05);
         transform: scale(1.02);
-        /* AKTIVNÍ STAV (ikona + text): vrátíme větší padding */
-        padding: 8px 16px;
+        /* Změna: Sjednoceno vertikální odsazení a upraveno horizontální */
+        padding: 10px 18px;
       }
 
       /* Zobrazení textu POUZE u aktivního tlačítka */
@@ -1063,15 +1062,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
+        width: 44px; /* Změna: Zvětšeno pro harmonii */
+        height: 44px; /* Změna: Zvětšeno pro harmonii */
         background: rgba(235, 235, 240, 0.7);
         border: 1px solid rgba(0, 0, 0, 0.04);
         border-radius: 50%; /* Kulaté tlačítko */
         cursor: pointer;
         transition: all 0.2s ease;
-        padding: 0; /* Zresetujeme padding */
-        box-shadow: none; /* Zresetujeme stín */
+        padding: 0;
+        box-shadow: none;
       }
 
       .ios-logout-button:hover {
