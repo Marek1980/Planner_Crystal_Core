@@ -4173,6 +4173,32 @@
         );
       }
 
+      // ==========================================
+      //  NOVÁ KOMPONENTA PRO ZMĚNU HESLA
+      // ==========================================
+      function UpdatePasswordView() {
+        return (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+            }}
+          >
+            <div className="card" style={{ width: 320 }}>
+              <h2>Nastavit nové heslo</h2>
+              <Auth
+                supabaseClient={supabase}
+                view="update_password"
+                theme="default"
+                providers={[]}
+              />
+            </div>
+          </div>
+        );
+      }
+
       // =================================================================
       // 6. HLAVNÍ APLIKACE
       // =================================================================
@@ -4243,35 +4269,43 @@
         };
 
         React.useEffect(() => {
-          // Nastavíme posluchače, který bude reagovat na změny stavu přihlášení.
           const {
             data: { subscription },
           } = supabase.auth.onAuthStateChange((event, session) => {
-            // Vždy jen aktualizujeme informaci o session (kdo je přihlášen).
             setSession(session);
 
-            // Reagujeme POUZE na dvě klíčové události:
-            if (event === 'INITIAL_SESSION' && session) {
-              // Toto se stane jen jednou při prvním načtení stránky,
-              // pokud je uživatel už přihlášen.
+            // 1. Speciální případ: Obnova hesla
+            if (event === 'PASSWORD_RECOVERY') {
+              setView('updatePassword'); // Zobrazíme formulář pro změnu hesla
+            }
+            // 2. Úspěšné přihlášení nebo první načtení
+            else if (
+              event === 'SIGNED_IN' ||
+              (event === 'INITIAL_SESSION' && session)
+            ) {
               initData(session);
-            } else if (event === 'SIGNED_IN') {
-              // Toto se stane jen při novém, aktivním přihlášení.
-              initData(session);
-            } else if (event === 'SIGNED_OUT') {
-              // Při odhlášení vyčistíme data.
+            }
+            // 3. Uživatel si úspěšně změnil heslo
+            else if (event === 'USER_UPDATED') {
+              // Po úspěšné změně hesla ho přesměrujeme na dashboard
+              setView('dashboard');
+            }
+            // 4. Odhlášení
+            else if (event === 'SIGNED_OUT') {
               setMyProfile(null);
               setAllProfiles([]);
               setRequests([]);
+              // Zajistíme, aby se po odhlášení nezobrazovala stránka pro změnu hesla
+              if (view === 'updatePassword') {
+                setView('dashboard');
+              }
             }
-            // Pro všechny ostatní události (jako TOKEN_REFRESHED) se nestane nic.
           });
 
-          // Funkce pro úklid.
           return () => {
             subscription.unsubscribe();
           };
-        }, []);
+        }, [view]); // DŮLEŽITÉ: Přidejte 'view' do závislostí
 
         React.useEffect(() => {
           if (form.from && form.to) {
@@ -6494,6 +6528,7 @@
                 allRequests={requests}
               />
             )}
+            {view === 'updatePassword' && <UpdatePasswordView />}
             {view === 'redphone' && (
               <RedphoneView profiles={allProfiles} myProfile={myProfile} />
             )}
