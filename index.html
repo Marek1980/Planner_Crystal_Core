@@ -2421,7 +2421,7 @@
         SUPABASE_URL: '%REACT_APP_SUPABASE_URL%',
         SUPABASE_KEY: '%REACT_APP_SUPABASE_KEY%',
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
-        DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
+        //DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',//
       };
 
     </script>
@@ -2434,7 +2434,7 @@
       const SUPABASE_URL = window.env.SUPABASE_URL;
       const SUPABASE_KEY = window.env.SUPABASE_KEY;
       const ADMIN_EMAIL = window.env.ADMIN_EMAIL;
-      const DEFAULT_PASS = window.env.DEFAULT_PASS;
+      //const DEFAULT_PASS = window.env.DEFAULT_PASS;//
 
       const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
         auth: {
@@ -4185,6 +4185,7 @@
         const [view, setView] = React.useState('dashboard');
         const [form, setForm] = React.useState({
           email: '',
+          password: '',
           from: '',
           to: '',
           type: 'vacation',
@@ -4473,55 +4474,50 @@
         const handleSimpleLogin = async (e) => {
           e.preventDefault();
           setLoading(true);
-
-          const email = form.email.toLowerCase().trim();
-
-          // Bezpečnostní vyčištění starých session
-          await supabase.auth.signOut();
-
-          // ADMIN login
-          if (email === ADMIN_EMAIL.toLowerCase().trim()) {
-            const { error } = await supabase.auth.signInWithPassword({
-              email,
-              password: DEFAULT_PASS,
-            });
-
-            if (error) {
-              await supabase.auth.signUp({ email, password: DEFAULT_PASS });
-            }
-
-            setLoading(false);
-            return;
-          }
-
-          // Check allowed email
-          const { data: allowed } = await supabase
-            .from('allowed_emails')
-            .select('*')
-            .eq('email', email)
-            .single();
-
-          if (!allowed) {
-            alert('⛔ Tento email nemá povolený přístup.');
-            setLoading(false);
-            return;
-          }
-
-          // Login attempt
           const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password: DEFAULT_PASS,
+            email: form.email.toLowerCase().trim(),
+            password: form.password,
           });
 
           if (error) {
-            // pokud user neexistuje → vytvoříme ho
-            await supabase.auth.signUp({
-              email,
-              password: DEFAULT_PASS,
-            });
+            alert('Nesprávný e-mail nebo heslo.');
+            console.error('Login error:', error.message);
           }
+          // Pokud není chyba, onAuthStateChange se postará o zbytek.
 
           setLoading(false);
+        };
+
+        const handlePasswordReset = async (e) => {
+          e.preventDefault();
+          const email = form.email.toLowerCase().trim();
+          if (!email) {
+            alert('Nejprve prosím zadejte váš e-mail do políčka výše.');
+            return;
+          }
+
+          const { data: allowed } = await supabase
+            .from('allowed_emails')
+            .select('email')
+            .eq('email', email)
+            .single();
+
+          if (!allowed && email !== ADMIN_EMAIL.toLowerCase().trim()) {
+            alert('Tento e-mail nemá povolený přístup do aplikace.');
+            return;
+          }
+
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.href,
+          });
+
+          if (error) {
+            alert('Chyba při odesílání odkazu: ' + error.message);
+          } else {
+            alert(
+              'Odesláno! Zkontrolujte prosím svou e-mailovou schránku a klikněte na odkaz pro nastavení hesla.'
+            );
+          }
         };
 
         const handleUpdateProfile = async (userId, field, value) => {
@@ -4741,18 +4737,43 @@
               <form
                 className="card"
                 onSubmit={handleSimpleLogin}
-                style={{ width: 320, textAlign: 'center' }}
+                style={{
+                  width: 320,
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
               >
-                <h2>👋 Alza Plánovač</h2>
+                <h2>👋 NEO Planner</h2>
                 <input
                   type="email"
                   placeholder="vas.email@alza.cz"
+                  value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
                 />
-                <button disabled={loading}>
+                <input
+                  type="password"
+                  placeholder="Heslo"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  required
+                />
+                <button type="submit" disabled={loading}>
                   {loading ? 'Ověřuji...' : 'Vstoupit'}
                 </button>
+                <div style={{ marginTop: 15, fontSize: '13px' }}>
+                  <a
+                    href="#"
+                    onClick={handlePasswordReset}
+                    style={{ color: '#64748b' }}
+                  >
+                    Zapomenuté nebo první heslo?
+                  </a>
+                </div>
               </form>
             </div>
           );
