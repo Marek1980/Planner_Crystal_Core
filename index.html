@@ -4740,7 +4740,16 @@
                 <input
                   type="email"
                   placeholder="vas.email@alza.cz"
+                  value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  required
+                />
+                {/* === NOVÉ POLE PRO HESLO === */}
+                <input
+                  type="password"
+                  placeholder="Heslo"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
                 />
                 <button disabled={loading}>
