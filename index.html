@@ -4474,33 +4474,63 @@
         const handleSimpleLogin = async (e) => {
           e.preventDefault();
           setLoading(true);
-          
-          const { email, password } = form;
 
-          // Bezpečnostní vyčištění staré session, pokud by nějaká zbyla
-          await supabase.auth.signOut();
+          const email = form.email.toLowerCase().trim();
+          const password = form.password;
+          const isTryingAsAdmin = email === ADMIN_EMAIL.toLowerCase().trim();
 
-          // Zkusíme se přihlásit s daty z formuláře
+          // Krok 1: Zkontrolujeme, zda má běžný uživatel vůbec povolený přístup.
+          if (!isTryingAsAdmin) {
+            const { data: allowed } = await supabase
+              .from('allowed_emails')
+              .select('id')
+              .eq('email', email)
+              .single();
+            if (!allowed) {
+              alert('⛔ Tento email nemá povolený přístup. Obraťte se na administrátora.');
+              setLoading(false);
+              return;
+            }
+          }
+
+          // Krok 2: Pokusíme se uživatele přihlásit.
           const { error: signInError } = await supabase.auth.signInWithPassword({
-            email: email.toLowerCase().trim(),
-            password: password,
+            email,
+            password,
           });
 
-          // Pokud přihlášení selže (protože uživatel např. neexistuje)...
+          // Krok 3: Pokud přihlášení selhalo, analyzujeme proč.
           if (signInError) {
-            // ...zkusíme ho rovnou zaregistrovat s těmi samými údaji.
-            // Toto funguje jako "první přihlášení = registrace".
-            const { error: signUpError } = await supabase.auth.signUp({
-              email: email.toLowerCase().trim(),
-              password: password,
-            });
+            // Byla to chyba "Špatné heslo"? To může znamenat i to, že uživatel ještě neexistuje.
+            if (signInError.message === 'Invalid login credentials') {
+              // Zkusíme ho tedy vytvořit (jako první přihlášení).
+              const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                email,
+                password,
+              });
 
-            if (signUpError) {
-              // Pokud selže i registrace (např. slabé heslo), zobrazíme chybu.
-              alert(signUpError.message);
+              if (signUpError) {
+                // Pokud selže i registrace, pravděpodobně už opravdu existuje a jen zadal špatné heslo.
+                alert('Špatné heslo nebo email. Zkuste to prosím znovu.');
+              } else if (signUpData.session) {
+                // Registrace proběhla a rovnou nás přihlásila (email confirmation je vypnutý).
+                // Hotovo, `onAuthStateChange` se o vše postará.
+              } else {
+                // Registrace proběhla, ale nepřihlásila nás (vyžaduje potvrzení emailu).
+                alert('Účet byl vytvořen! Na váš email byl odeslán potvrzovací odkaz. Prosím, potvrďte svůj účet a poté se znovu přihlaste.');
+              }
+            } else if (signInError.message.includes("Email not confirmed")) {
+              // Speciální případ, kdy uživatel existuje, ale nekliknul na odkaz.
+              alert('Váš účet ještě nebyl potvrzen. Zkontrolujte prosím svůj email (i spam) a klikněte na potvrzovací odkaz.');
+            } else {
+              // Jakákoliv jiná chyba.
+              alert(`Nastala chyba: ${signInError.message}`);
             }
           }
           
+          // Pokud signInError nebyla žádná chyba, přihlášení proběhlo úspěšně
+          // a onAuthStateChange se postará o zbytek.
+
           setLoading(false);
         };
 
