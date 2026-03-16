@@ -4474,54 +4474,46 @@
         const handleSimpleLogin = async (e) => {
           e.preventDefault();
           setLoading(true);
-
           const email = form.email.toLowerCase().trim();
+          
+          // 1. Určíme, které heslo se má použít
+          const isTryingAsAdmin = email === ADMIN_EMAIL.toLowerCase().trim();
+          const passwordToUse = isTryingAsAdmin ? ADMIN_PASS : USER_PASS;
 
-          // Bezpečnostní vyčištění starých session
+          // Bezpečnostní vyčištění staré session
           await supabase.auth.signOut();
 
-          // ADMIN login
-          if (email === ADMIN_EMAIL.toLowerCase().trim()) {
-            const { error } = await supabase.auth.signInWithPassword({
-              email,
-              password: DEFAULT_PASS,
-            });
-
-            if (error) {
-              await supabase.auth.signUp({ email, password: DEFAULT_PASS });
+          // 2. Pro běžného uživatele zkontrolujeme, zda má přístup
+          if (!isTryingAsAdmin) {
+            const { data: allowed } = await supabase
+              .from('allowed_emails')
+              .select('id')
+              .eq('email', email)
+              .single();
+            if (!allowed) {
+              alert('⛔ Tento email nemá povolený přístup.');
+              setLoading(false);
+              return;
             }
-
-            setLoading(false);
-            return;
           }
 
-          // Check allowed email
-          const { data: allowed } = await supabase
-            .from('allowed_emails')
-            .select('*')
-            .eq('email', email)
-            .single();
-
-          if (!allowed) {
-            alert('⛔ Tento email nemá povolený přístup.');
-            setLoading(false);
-            return;
-          }
-
-          // Login attempt
+          // 3. Pokus o přihlášení se správným heslem
           const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password: DEFAULT_PASS,
+            email: email,
+            password: passwordToUse,
           });
 
+          // 4. Pokud uživatel neexistuje, vytvoříme ho se správným heslem
           if (error) {
-            // pokud user neexistuje → vytvoříme ho
-            await supabase.auth.signUp({
-              email,
-              password: DEFAULT_PASS,
+            const { error: signUpError } = await supabase.auth.signUp({
+              email: email,
+              password: passwordToUse,
             });
+             if (signUpError) {
+                alert("Nastala chyba při vytváření účtu: " + signUpError.message);
+             }
           }
-
+          
           setLoading(false);
         };
 
