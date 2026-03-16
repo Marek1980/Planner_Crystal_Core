@@ -2421,7 +2421,8 @@
         SUPABASE_URL: '%REACT_APP_SUPABASE_URL%',
         SUPABASE_KEY: '%REACT_APP_SUPABASE_KEY%',
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
-        DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
+        ADMIN_PASS: '%REACT_APP_ADMIN_PASS%',   // <-- Přidáno heslo admina
+        USER_PASS: '%REACT_APP_USER_PASS%',     // <-- Přidáno heslo uživatelů
       };
 
     </script>
@@ -2433,7 +2434,8 @@
       const SUPABASE_URL = window.env.SUPABASE_URL;
       const SUPABASE_KEY = window.env.SUPABASE_KEY;
       const ADMIN_EMAIL = window.env.ADMIN_EMAIL;
-      const DEFAULT_PASS = window.env.DEFAULT_PASS;
+      const ADMIN_PASS = window.env.ADMIN_PASS;
+      const USER_PASS = window.env.USER_PASS;
       const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
         auth: {
           storage: window.sessionStorage,
