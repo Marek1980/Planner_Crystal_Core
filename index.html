@@ -2421,25 +2421,39 @@
         SUPABASE_URL: '%REACT_APP_SUPABASE_URL%',
         SUPABASE_KEY: '%REACT_APP_SUPABASE_KEY%',
         ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
-        DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
-      };
 
-    </script>
-    <script type="text/babel">
-      // =================================================================
-      // 3. KONFIGURACE A KONSTANTY
-      // =================================================================
-      // ✅ KROK 2: Čteme hodnoty z 'window.env' místo z 'process.env'
-      const SUPABASE_URL = window.env.SUPABASE_URL;
-      const SUPABASE_KEY = window.env.SUPABASE_KEY;
-      const ADMIN_EMAIL = window.env.ADMIN_EMAIL;
-      const DEFAULT_PASS = window.env.DEFAULT_PASS;
-      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: {
-          storage: window.sessionStorage,
-        },
-      });
-      
+        // --- ZMĚNA ZAČÍNÁ ZDE ---
+        // Původní jedno heslo je nahrazeno čtyřmi specifickými
+        ADMIN_DEFAULT_PASS: '%REACT_APP_ADMIN_DEFAULT_PASS%',
+        PASS_SPECIALISTA: '%REACT_APP_PASS_SPECIALISTA%',
+        PASS_TEAMLEADER: '%REACT_APP_PASS_TEAMLEADER%',
+        PASS_MANAZER: '%REACT_APP_PASS_MANAZER%',
+        // --- ZMĚNA KONČÍ ZDE ---
+      };
+      <script type="text/babel">
+
+        // =================================================================
+        // 3. KONFIGURACE A KONSTANTY
+        // =================================================================
+        // ✅ KROK 2: Čteme hodnoty z 'window.env' místo z 'process.env'
+        const SUPABASE_URL = window.env.SUPABASE_URL;
+        const SUPABASE_KEY = window.env.SUPABASE_KEY;
+        const ADMIN_EMAIL = window.env.ADMIN_EMAIL;
+
+        // --- ZMĚNA ZAČÍNÁ ZDE ---
+        // Načítáme nově definovaná hesla z window.env
+        const ADMIN_DEFAULT_PASS = window.env.ADMIN_DEFAULT_PASS;
+        const PASS_SPECIALISTA = window.env.PASS_SPECIALISTA;
+        const PASS_TEAMLEADER = window.env.PASS_TEAMLEADER;
+        const PASS_MANAZER = window.env.PASS_MANAZER;
+        // --- ZMĚNA KONČÍ ZDE ---
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+          auth: {
+            storage: window.sessionStorage,
+          },
+        });
+
       // =================================================================
       // 4. POMOCNÉ FUNKCE
       // =================================================================
@@ -4472,51 +4486,41 @@
           e.preventDefault();
           setLoading(true);
 
-          const email = form.email.toLowerCase().trim();
+          // Získáme email a nově i heslo z formuláře
+          const { email, password } = form;
 
-          // Bezpečnostní vyčištění starých session
+          if (!email || !password) {
+            alert('Zadejte prosím e-mail i heslo.');
+            setLoading(false);
+            return;
+          }
+
+          // Bezpečnostní vyčištění staré session
           await supabase.auth.signOut();
 
-          // ADMIN login
-          if (email === ADMIN_EMAIL.toLowerCase().trim()) {
-            const { error } = await supabase.auth.signInWithPassword({
-              email,
-              password: DEFAULT_PASS,
-            });
-
-            if (error) {
-              await supabase.auth.signUp({ email, password: DEFAULT_PASS });
+          // Pokusíme se přihlásit s e-mailem a heslem, které uživatel zadal
+          const { error: signInError } = await supabase.auth.signInWithPassword(
+            {
+              email: email.toLowerCase().trim(),
+              password: password,
             }
+          );
 
-            setLoading(false);
-            return;
-          }
-
-          // Check allowed email
-          const { data: allowed } = await supabase
-            .from('allowed_emails')
-            .select('*')
-            .eq('email', email)
-            .single();
-
-          if (!allowed) {
-            alert('⛔ Tento email nemá povolený přístup.');
-            setLoading(false);
-            return;
-          }
-
-          // Login attempt
-          const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password: DEFAULT_PASS,
-          });
-
-          if (error) {
-            // pokud user neexistuje → vytvoříme ho
-            await supabase.auth.signUp({
-              email,
-              password: DEFAULT_PASS,
+          // Pokud přihlášení selže (např. protože je to první přihlášení a účet neexistuje)...
+          if (signInError) {
+            // ...zkusíme uživatele zaregistrovat se zadaným heslem.
+            // Uživatel musí zadat heslo, které odpovídá jeho roli (např. 'specialista-2026').
+            const { error: signUpError } = await supabase.auth.signUp({
+              email: email.toLowerCase().trim(),
+              password: password,
             });
+
+            // Pokud selže i registrace, pravděpodobně zadal špatné heslo nebo e-mail
+            if (signUpError) {
+              alert(
+                'Přihlášení selhalo. Zkontrolujte prosím své přihlašovací údaje.'
+              );
+            }
           }
 
           setLoading(false);
@@ -4748,7 +4752,18 @@
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
                 />
-                <button disabled={loading}>
+                {/* === NOVĚ PŘIDANÉ POLE PRO HESLO === */}
+                <input
+                  type="password"
+                  placeholder="Heslo"
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  required
+                  style={{ marginTop: '10px' }} // Pro malou mezeru
+                />
+                {/* ===================================== */}
+                <button disabled={loading} style={{ marginTop: '15px' }}>
                   {loading ? 'Ověřuji...' : 'Vstoupit'}
                 </button>
               </form>
