@@ -4342,49 +4342,58 @@
         }, [form.from, form.to, form.type, requests, session]);
 
         const initData = async (s) => {
+          if (!s) return; // Pojistka, kdyby session byla null
+
           const userEmail = s.user.email.toLowerCase().trim();
           const adminEmail = ADMIN_EMAIL.toLowerCase().trim();
           setIsAdmin(userEmail === adminEmail);
-          fetchRequests();
 
-          // 1) Najdeme profil podle emailu
-          const { data: existingProfile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('email', userEmail)
-            .single();
-
-          // 2) Pokud profil existuje → aktualizujeme jeho user_id (pokud není)
-          if (existingProfile) {
-            if (!existingProfile.id || existingProfile.id !== s.user.id) {
-              await supabase
-                .from('profiles')
-                .update({ id: s.user.id })
-                .eq('email', userEmail);
-            }
-          }
-          // 3) Pokud neexistuje → vytvoříme nový profil
-          else {
-            await supabase.from('profiles').insert([
-              {
-                id: s.user.id,
-                email: userEmail,
-                full_name: userEmail.split('@')[0],
-                vacation_limit: 160,
-                whatever_limit: 5,
-              },
-            ]);
-          }
-
-          const { data: profile } = await supabase
+          // --- KROK 1: Pokus o načtení existujícího profilu ---
+          let { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', s.user.id)
             .single();
+
+          // --- KROK 2: Pokud profil neexistuje, vytvoříme ho ---
+          if (!profile) {
+            console.log("Profil nenalezen, vytvářím nový...");
+            const { data: newProfile, error: insertError } = await supabase
+              .from('profiles')
+              .insert([
+                {
+                  id: s.user.id, // Klíčové propojení s auth.users
+                  email: userEmail,
+                  full_name: userEmail.split('@')[0], // Výchozí jméno
+                  vacation_limit: 160, // Výchozí limity
+                  whatever_limit: 5,
+                },
+              ])
+              .select()
+              .single();
+
+            if (insertError) {
+              // Pokud selže i vytvoření, je to vážná chyba v databázi.
+              console.error("KRITICKÁ CHYBA: Nepodařilo se vytvořit profil!", insertError);
+              alert("Kritická chyba: Nepodařilo se inicializovat uživatelský profil.");
+              // Zde se proces zastaví, protože bez profilu nelze pokračovat.
+              return; 
+            }
+            
+            // Pokud se vytvoření podařilo, nastavíme ho jako aktuální profil.
+            profile = newProfile;
+          }
+
+          // --- KROK 3: S profilem v ruce pokračujeme v načítání zbytku dat ---
+          // Tento kód se spustí, pouze pokud `profile` zaručeně existuje.
+          console.log("Profil úspěšně načten/vytvořen:", profile);
           setMyProfile(profile);
 
+          // Načteme ostatní data aplikace
+          fetchRequests();
           fetchAllProfiles();
           fetchAnnouncement();
+
           if (userEmail === adminEmail) {
             fetchAllowedEmails();
           }
