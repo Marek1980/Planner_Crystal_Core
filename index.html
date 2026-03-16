@@ -4474,44 +4474,31 @@
         const handleSimpleLogin = async (e) => {
           e.preventDefault();
           setLoading(true);
-          const email = form.email.toLowerCase().trim();
           
-          // 1. Určíme, které heslo se má použít
-          const isTryingAsAdmin = email === ADMIN_EMAIL.toLowerCase().trim();
-          const passwordToUse = isTryingAsAdmin ? ADMIN_PASS : USER_PASS;
+          const { email, password } = form;
 
-          // Bezpečnostní vyčištění staré session
+          // Bezpečnostní vyčištění staré session, pokud by nějaká zbyla
           await supabase.auth.signOut();
 
-          // 2. Pro běžného uživatele zkontrolujeme, zda má přístup
-          if (!isTryingAsAdmin) {
-            const { data: allowed } = await supabase
-              .from('allowed_emails')
-              .select('id')
-              .eq('email', email)
-              .single();
-            if (!allowed) {
-              alert('⛔ Tento email nemá povolený přístup.');
-              setLoading(false);
-              return;
-            }
-          }
-
-          // 3. Pokus o přihlášení se správným heslem
-          const { error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: passwordToUse,
+          // Zkusíme se přihlásit s daty z formuláře
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: email.toLowerCase().trim(),
+            password: password,
           });
 
-          // 4. Pokud uživatel neexistuje, vytvoříme ho se správným heslem
-          if (error) {
+          // Pokud přihlášení selže (protože uživatel např. neexistuje)...
+          if (signInError) {
+            // ...zkusíme ho rovnou zaregistrovat s těmi samými údaji.
+            // Toto funguje jako "první přihlášení = registrace".
             const { error: signUpError } = await supabase.auth.signUp({
-              email: email,
-              password: passwordToUse,
+              email: email.toLowerCase().trim(),
+              password: password,
             });
-             if (signUpError) {
-                alert("Nastala chyba při vytváření účtu: " + signUpError.message);
-             }
+
+            if (signUpError) {
+              // Pokud selže i registrace (např. slabé heslo), zobrazíme chybu.
+              alert(signUpError.message);
+            }
           }
           
           setLoading(false);
