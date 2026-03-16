@@ -2415,17 +2415,30 @@
   <body>
     <div id="root"></div>
 
-<div id="root"></div>
-<script type="text/babel">
-  // =================================================================
-  // 3. KONFIGURACE A KONSTANTY
-  // =================================================================
-  const SUPABASE_URL = 'https://bprawiumolizfnhuigpf.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_OCC-K3xibSWzFoLgcQ7kyg_39EH34zQ'; // Toto je bezpečné
-  const ADMIN_EMAIL = 'marek.horacek@alza.cz';
+    <!-- ✅ KROK 1: Vložíme proměnné z Vercelu do 'window' objektu -->
+    <script>
+      window.env = {
+        SUPABASE_URL: '%REACT_APP_SUPABASE_URL%',
+        SUPABASE_KEY: '%REACT_APP_SUPABASE_KEY%',
+        ADMIN_EMAIL: '%REACT_APP_ADMIN_EMAIL%',
+        DEFAULT_PASS: '%REACT_APP_DEFAULT_PASS%',
+      };
 
-  // Inicializace Supabase klienta
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
+    <script type="text/babel">
+      // =================================================================
+      // 3. KONFIGURACE A KONSTANTY
+      // =================================================================
+      // ✅ KROK 2: Čteme hodnoty z 'window.env' místo z 'process.env'
+      const SUPABASE_URL = window.env.SUPABASE_URL;
+      const SUPABASE_KEY = window.env.SUPABASE_KEY;
+      const ADMIN_EMAIL = window.env.ADMIN_EMAIL;
+      const DEFAULT_PASS = window.env.DEFAULT_PASS;
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+          storage: window.sessionStorage,
+        },
+      });
 
       // =================================================================
       // 4. POMOCNÉ FUNKCE
@@ -4170,7 +4183,6 @@
         const [view, setView] = React.useState('dashboard');
         const [form, setForm] = React.useState({
           email: '',
-          password: '',
           from: '',
           to: '',
           type: 'vacation',
@@ -4459,27 +4471,28 @@
         const handleSimpleLogin = async (e) => {
           e.preventDefault();
           setLoading(true);
+
           const email = form.email.toLowerCase().trim();
-          const password = form.password; // Uložíme si heslo z formuláře
 
           // Bezpečnostní vyčištění starých session
           await supabase.auth.signOut();
 
-          // ADMIN login se nemění, ten má stále své heslo z konstant
+          // ADMIN login
           if (email === ADMIN_EMAIL.toLowerCase().trim()) {
             const { error } = await supabase.auth.signInWithPassword({
               email,
-              password: password, // <-- Změna na heslo z formuláře
+              password: DEFAULT_PASS,
             });
+
             if (error) {
-              alert('Chybné přihlašovací údaje pro admina.');
+              await supabase.auth.signUp({ email, password: DEFAULT_PASS });
             }
+
             setLoading(false);
             return;
           }
 
-          // Běžný uživatel
-          // 1. Zkontrolujeme, zda má povolený přístup
+          // Check allowed email
           const { data: allowed } = await supabase
             .from('allowed_emails')
             .select('*')
@@ -4492,31 +4505,19 @@
             return;
           }
 
-          // 2. Pokus o přihlášení s heslem z formuláře
+          // Login attempt
           const { error } = await supabase.auth.signInWithPassword({
             email,
-            password: password, // <-- Změna na heslo z formuláře
+            password: DEFAULT_PASS,
           });
 
           if (error) {
-            // Pokud přihlášení selže (např. chybné heslo nebo uživatel neexistuje)
-            // Zkusíme ho rovnou zaregistrovat s tímto heslem.
-            // To funguje jako "první přihlášení = registrace".
-            const { error: signUpError } = await supabase.auth.signUp({
+            // pokud user neexistuje → vytvoříme ho
+            await supabase.auth.signUp({
               email,
-              password: password, // <-- Změna na heslo z formuláře
+              password: DEFAULT_PASS,
             });
-
-            if (signUpError) {
-              // Pokud i registrace selže (např. heslo je moc krátké), zobrazíme chybu.
-              alert('Chyba: ' + signUpError.message);
-            } else {
-              // Po úspěšné registraci se Supabase automaticky přihlásí,
-              // takže nemusíme dělat nic dalšího. Refresh dat se spustí automaticky.
-            }
           }
-          // Pokud přihlášení proběhlo v pořádku (první `signInWithPassword`),
-          // kód pokračuje a useEffect zařídí načtení dat.
 
           setLoading(false);
         };
@@ -4747,17 +4748,6 @@
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
                 />
-                {/* === NOVÉ POLE PRO HESLO === */}
-                <input
-                  type="password"
-                  placeholder="Heslo"
-                  value={form.password} // Doporučuji přidat i value
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
-                  required
-                />
-                {/* ============================ */}
                 <button disabled={loading}>
                   {loading ? 'Ověřuji...' : 'Vstoupit'}
                 </button>
@@ -5042,19 +5032,6 @@
                   onClick={async () => {
                     await supabase.auth.signOut();
                     setSession(null);
-
-                    // === PŘIDANÝ KÓD PRO VYČIŠTĚNÍ FORMULÁŘE ===
-                    setForm({
-                      email: '',
-                      password: '',
-                      from: '',
-                      to: '',
-                      type: 'vacation',
-                      newUser: '',
-                      bdayName: '',
-                      bdayDate: '',
-                    });
-                    // ============================================
                   }}
                   title="Odhlásit"
                 >
